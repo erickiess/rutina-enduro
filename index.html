@@ -209,6 +209,24 @@ tr:last-child td{border-bottom:0}
 .chk.on i{background:var(--ok);border-color:var(--ok);color:#04210f}
 .chk.on span{color:var(--mut)}
 .foot{text-align:center;margin-top:18px;font:600 12px var(--disp);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+
+/* cómo se hace: miniaturas, fotos y pasos */
+.th{flex:none;width:56px;height:56px;border-radius:12px;overflow:hidden;background:#fff;display:grid;place-items:center;cursor:pointer;border:1px solid var(--line2)}
+.th img{width:100%;height:100%;object-fit:cover}
+.th.noimg{background:var(--card3);color:var(--mut)}.th.noimg svg.i{width:22px;height:22px}
+.exl li{align-items:center;cursor:pointer}.exl li .th{width:42px;height:42px;border-radius:10px}.exl li .nm{flex:1;min-width:0}
+.exh>div{flex:1;min-width:0}
+.howl{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:0;background:none;border:0;color:var(--acc2);font:600 13px var(--body)}
+.ph{position:relative;aspect-ratio:3/2;border-radius:16px;overflow:hidden;background:#fff;margin:14px 0 6px}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph.two img:nth-child(2),.pl.b{animation:swap 3.2s infinite}.pl.a{animation:swapr 3.2s infinite}
+@keyframes swap{0%,42%{opacity:0}50%,92%{opacity:1}100%{opacity:0}}
+@keyframes swapr{0%,42%{opacity:1}50%,92%{opacity:0}100%{opacity:1}}
+.pl{position:absolute;left:10px;bottom:10px;font:700 12px var(--disp);text-transform:uppercase;letter-spacing:.08em;padding:4px 9px;border-radius:8px;background:#000b;color:#fff}
+ol.how{margin:12px 0 4px;padding:0;list-style:none;counter-reset:s}
+ol.how li{counter-increment:s;position:relative;padding:9px 0 9px 36px;border-top:1px solid var(--line);font-size:15px}
+ol.how li:first-child{border-top:0}
+ol.how li::before{content:counter(s);position:absolute;left:0;top:9px;width:24px;height:24px;border-radius:8px;background:var(--accbg);color:var(--acc2);font:800 14px/24px var(--disp);text-align:center}
 </style>
 </head>
 <body>
@@ -256,10 +274,47 @@ const SES={
   {id:'c1',n:'Press banca',s:3,r:'6',rest:90,kg:1,inc:2.5,core:1,grp:'Bloque 1 · superserie con remo'},
   {id:'c2',n:'Remo con mancuerna',s:3,r:'10 por lado',rest:90,kg:1,inc:2,core:1,grp:'Bloque 1 · superserie con press'},
   {id:'c3',n:'Circuito "especial"',s:5,r:'rondas',rest:90,circuit:1,core:1,meas:'min',grp:'Bloque 2',note:'El agarre trabaja cansado y con pulsaciones altas: así es el arm pump real. Anotá el tiempo total (min).',items:[
-    {n:'Bici fija 60" fuerte'},{n:'Swing con pesa rusa x15',id:'c3sw',inc:4},{n:'Farmer carry pesado 30 m',id:'c3fc',inc:2},{n:'Flexiones x12'},{n:'Sentadilla isométrica 30"'}]},
+    {n:'Bici fija 60" fuerte',h:'bf'},{n:'Swing con pesa rusa x15',id:'c3sw',inc:4,h:'sw'},{n:'Farmer carry pesado 30 m',id:'c3fc',inc:2,h:'fc'},{n:'Flexiones x12',h:'pu'},{n:'Sentadilla isométrica 30"',h:'iso'}]},
   {id:'c4',n:'Rueda abdominal',s:3,r:'10',rest:60,grp:'Bloque 3 · core'},
   {id:'c5',n:'Plancha lateral',s:3,r:'40" por lado',rest:45,secs:40,grp:'Bloque 3 · core'}]}
 };
+// Cómo se hace cada ejercicio. Fotos: free-exercise-db (dominio público), en img/ex/. f = aclaración cuando la foto no es exacta.
+const HOW={
+ a1:{img:['a1-0','a1-1'],m:'Piernas, glúteos y zona media',c:['Barra apoyada arriba de la espalda (sobre los trapecios), no en el cuello.','Pies al ancho de los hombros, puntas un poco hacia afuera.','Bajá como sentándote atrás, hasta que la cadera quede a la altura de las rodillas o un poco más abajo.','Rodillas en la misma dirección que las puntas; pecho arriba y espalda firme.','Subí empujando el piso con todo el pie.']},
+ a2:{img:['a2-0','a2-1'],m:'Atrás del muslo (isquios), glúteos y lumbares',c:['Parado con la barra en las manos, rodillas apenas flexionadas y fijas.','Llevá la cola hacia atrás, como cerrando una puerta con la cola. La barra baja pegada a las piernas.','Bajá hasta sentir que tira atrás del muslo (más o menos debajo de las rodillas), siempre con la espalda recta.','Volvé apretando los glúteos.']},
+ a3:{img:['a3-0','a3-1'],m:'Cuádriceps, glúteos y equilibrio',f:'En la foto el pie de atrás está en el piso: en la búlgara va apoyado en un banco.',c:['Empeine del pie de atrás apoyado en un banco; el de adelante, un paso largo por delante.','Bajá recto hasta que el muslo de adelante quede casi paralelo al piso.','El peso va en la pierna de adelante; la de atrás solo equilibra.','Hacé todas las repeticiones con una pierna y después cambiá.']},
+ a4:{img:['a4-1'],m:'Cuádriceps y aguante en la posición de manejo',c:['Mancuernas colgando a los costados. Bajá a media sentadilla (rodillas a unos 110°, como en la foto) y quedate quieto.','Como parado en los pedalines: pecho adelante, rodillas un poco abiertas, peso en la parte de adelante del pie.','Respirá normal y aguantá 45 a 60 segundos.']},
+ a5:{img:['a5-0','a5-1'],m:'Oblicuos, lumbares y agarre',f:'La foto es con dos pesas: acá se hace con una sola, como si llevaras una valija.',c:['Una sola pesa pesada en una mano.','Caminá derecho sin inclinarte hacia el lado de la pesa: el ejercicio es mantenerte recto.','30 m con una mano, cambiás de mano y volvés.']},
+ a6:{img:['a6-0','a6-1'],m:'Abdominales y oblicuos (anti-rotación)',c:['De costado a la polea, manija a la altura del pecho, agarrada con las dos manos.','Empujá los brazos al frente y aguantá 2 segundos sin dejar que la polea te gire el torso.','Volvé al pecho despacio. El tronco no se mueve en todo el ejercicio.','Hacé un lado y después el otro.']},
+ b1:{img:['b1-0','b1-1'],m:'Espalda (dorsales), bíceps y agarre',c:['Agarre un poco más ancho que los hombros, palmas hacia adelante.','Peso colgado de un cinturón, o una mancuerna apretada entre los pies.','Subí hasta pasar el mentón por arriba de la barra; bajá controlado hasta estirar los brazos.','Si con peso no salen 5, hacelas sin lastre.']},
+ b2:{img:['b2-0','b2-1'],m:'Espalda alta y dorsales',c:['Boca abajo en un banco inclinado (30 a 45°), una mancuerna en cada mano.','Llevá los codos hacia atrás, cerca del cuerpo.','Arriba, juntá los omóplatos 1 segundo. Bajá despacio.','El pecho no se despega del banco: así no hacés trampa con la espalda baja.']},
+ b3:{img:['b3-0','b3-1'],m:'Hombros, tríceps y zona media',c:['De pie, mancuernas a la altura de los hombros.','Apretá glúteos y abdomen para no arquear la espalda.','Empujá hacia arriba hasta estirar los brazos, sin chocar las pesas.','Bajá controlado hasta los hombros.']},
+ b4:{img:['b4-0','b4-1'],m:'Hombro de atrás y espalda alta',c:['Polea alta con soga.','Tirá la soga hacia la cara separando las manos, con los codos altos (a la altura de los hombros).','Al final las manos quedan a los costados de la cabeza, como mostrando bíceps.','Peso liviano y controlado. Corrige la postura encorvada de la moto.']},
+ b5:{img:['b5-0','b5-1'],m:'Manguito rotador (protege el hombro)',c:['Polea a la altura del codo, de costado.','Codo pegado al cuerpo y doblado a 90°. Ayuda poner una toalla enrollada entre el codo y las costillas.','Girá el antebrazo hacia afuera, como abriendo una puerta, sin despegar el codo.','Peso muy liviano.']},
+ b6:{img:['b6-0','b6-1'],m:'Hombros, zona media y coordinación',c:['Acostado boca arriba, pesa rusa en una mano y ese brazo estirado hacia el techo.','Te levantás hasta quedar parado y volvés a acostarte, siempre con el brazo arriba y mirando la pesa.','Orden: apoyás el codo, después la mano, levantás la cadera, pasás la pierna por debajo, rodilla, y te parás.','Lento y con poco peso hasta aprenderlo. Te sirve para levantarte con la moto trabada.']},
+ b7:{img:['b7-0'],m:'Agarre y antebrazos',f:'En la foto el agarre está tapado por la barra de adelante: es colgarse quieto.',c:['Colgate de la barra con los brazos estirados.','Hombros activos (no del todo sueltos) y agarre firme.','Aguantá lo más que puedas y anotá los segundos. Ayuda contra el arm pump.']},
+ b8:{img:['b8-0','b8-1'],m:'Antebrazos',c:['Brazos estirados al frente, agarrando el palo.','Enrollá la soga girando las muñecas hasta que la pesa llegue arriba.','Después desenrollá despacio para que baje. Una subida y una bajada es una serie.']},
+ b9:{img:[],m:'Músculos que abren la mano',c:['Poné una gomita alrededor de los cinco dedos, con las puntas juntas.','Abrí los dedos lo más que puedas contra la goma y cerrá despacio.','20 repeticiones. Equilibra todo el trabajo de agarre.']},
+ c1:{img:['c1-0','c1-1'],m:'Pecho, hombros y tríceps',c:['Acostado en el banco, pies firmes en el piso, omóplatos juntos y apretados contra el banco.','Bajá la barra hasta rozar el pecho (a la altura del esternón), con los codos a unos 45° del cuerpo.','Empujá hasta estirar los brazos.','Si vas pesado, que alguien te asista.']},
+ c2:{img:['c2-0','c2-1'],m:'Dorsales, espalda alta y bíceps',c:['Rodilla y mano del mismo lado apoyadas en el banco, espalda plana.','Tirá la mancuerna hacia la cadera, con el codo cerca del cuerpo.','Bajá hasta estirar el brazo del todo.']},
+ c3:{img:[],m:'Todo el cuerpo, agarre y pulsaciones',c:['Hacé los 5 ejercicios de abajo seguidos, sin pausa entre ellos: eso es una ronda.','Pausa de 90 segundos entre rondas.']},
+ bf:{img:['bf-0','bf-1'],m:'Pulsaciones',c:['60 segundos a fondo, con resistencia alta.']},
+ sw:{img:['sw-0','sw-1'],m:'Glúteos, isquios, agarre y pulsaciones',f:'La foto es con una mano: hacelo con las dos.',c:['Pesa rusa entre las piernas; la cadera va atrás, como en el rumano.','Empujá la cadera fuerte hacia adelante: la pesa sube sola hasta la altura del pecho.','Los brazos solo guían; la fuerza sale de la cadera.']},
+ fc:{img:['a5-0','a5-1'],m:'Agarre y trapecios',c:['Una pesa pesada en cada mano.','Caminá derecho con pasos cortos y los hombros atrás.']},
+ pu:{img:['pu-0','pu-1'],m:'Pecho, tríceps y zona media',c:['Manos un poco más abiertas que los hombros, cuerpo recto como una tabla.','Bajá hasta que el pecho casi toque el piso y subí.','Si no salen, con las rodillas apoyadas.']},
+ iso:{img:['a4-1'],m:'Cuádriceps',f:'Igual que en la foto, pero sin peso.',c:['Media sentadilla quieta durante 30 segundos.']},
+ c4:{img:['c4-0','c4-1'],m:'Abdominales',c:['De rodillas, con la rueda en el piso debajo de los hombros.','Rodá hacia adelante estirando el cuerpo hasta donde puedas sin que se hunda la espalda baja.','Volvé tirando con el abdomen.']},
+ c5:{img:['c5-0','c5-1'],m:'Oblicuos y cadera',c:['De costado, apoyado en el antebrazo (codo debajo del hombro) y en el costado de los pies.','Levantá la cadera hasta que el cuerpo quede recto.','Aguantá 40 segundos y cambiá de lado.']}
+};
+const EXIMG=f=>`img/ex/${f}.jpg`;
+function thumb(id){const h=HOW[id],f=h&&h.img[0];return `<span class="th ${f?'':'noimg'}" data-act="how" data-id="${id}">${f?`<img src="${EXIMG(f)}" alt="" loading="lazy">`:ic('info')}</span>`}
+function photo(h){if(!h.img.length)return '';return `<div class="ph ${h.img.length>1?'two':''}">${h.img.map((f,i)=>`<img src="${EXIMG(f)}" alt="">`).join('')}${h.img.length>1?'<span class="pl a">Inicio</span><span class="pl b">Final</span>':''}</div>`}
+function howBlock(id,name){const h=HOW[id];if(!h)return '';return `${name?`<h2>${esc(name)}</h2>`:''}${photo(h)}${h.f?`<div class="note">📷 ${h.f}</div>`:''}<ol class="how">${h.c.map(x=>`<li>${x}</li>`).join('')}</ol>`}
+function howSheet(id){
+ const e=GYM.flatMap(g=>SES[g].ex).find(x=>x.id===id);if(!e||!HOW[id])return;const h=HOW[id];
+ let x=`<div class="eyebrow">Cómo se hace</div><h1>${esc(e.n)}</h1><div class="tag acc">${h.m}</div>${howBlock(id)}`;
+ if(e.items)x+=e.items.map(it=>howBlock(it.h,it.n)).join('');
+ sheet(x+`<button class="btn ghost" data-act="closesheet">Cerrar</button>`)}
 const ACT={
  Z2:{name:'Bici Z2',title:'Bici afuera, 75 a 120 min',li:['Ritmo en el que podés hablar en frases completas.','La base aeróbica es lo que más baja el arm pump.','Si hay MTB, mejor que la de ruta: suma agarre y trabajo parado.']},
  SUB:{name:'Bici: subidas',title:"6 x 3' fuerte / 3' suave",li:["Toca cada 2 semanas en lugar del Z2.","Entrada en calor de 15' suave antes.","Si hay MTB, mejor: subidas paradas en los pedales."]},
@@ -409,7 +464,7 @@ const ICP={
  check:'<path d="M20 6 9 17l-5-5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
  zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',cal:'<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>',
  chart:'<path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>',cog:'<path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/>',
- play:'<path d="m7 4 13 8-13 8z"/>'};
+ play:'<path d="m7 4 13 8-13 8z"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'};
 function ic(n){return `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICP[n]}</svg>`}
 function cat(k){return GYM.includes(k)?'gym':k==='MOTO'?'moto':['Z2','SUB','BICI'].includes(k)?'bici':k==='NOPUEDO'?'no':k==='PASADO'?'past':'rest'}
 function badge(k,sz=''){const c=cat(k);return `<span class="bdg ${c} ${sz}">${c==='gym'?k:ic({moto:'moto',bici:'bici',no:'x',past:'dot',rest:'moon'}[c])}</span>`}
@@ -483,7 +538,7 @@ function heroCard(p,P){
   const s=SES[k];
   h+=hd(k,`${p.moved?'Reprogramada para hoy':'Toca hoy'} · ${ic('clock')} ~${s.min} min`,s.title);
   if(S.block.week===4)h+=`<div class="tag warn" style="margin-top:8px">Descarga: menos series</div>`;
-  h+=`<ul class="exl">${s.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.s} × ${esc(e.r)}</b></li>`).join('')}</ul>`;
+  h+=`<ul class="exl">${s.ex.map(e=>`<li data-act="how" data-id="${e.id}">${thumb(e.id)}<span class="nm">${esc(e.n)}</span><b>${e.s} × ${esc(e.r)}</b></li>`).join('')}</ul>`;
   h+=`<button class="btn" data-act="checkin" data-v="${k}">${ic('play')} Empezar</button>`;
  }else if(k==='MOTO'){
   h+=hd(k,'Toca hoy','Moto','Antes de salir (10\')');
@@ -548,7 +603,7 @@ function renderWork(){
   const x=d.ex[e.id];num++;
   if(e.grp&&e.grp!==grp){grp=e.grp;h+=`<h2>${esc(grp)}</h2>`}
   const all=x.done.every(Boolean);
-  h+=`<div class="ex ${all?'alldone':''}"><div class="exh"><span class="n">${all?ic('check'):String(num).padStart(2,'0')}</span><div><div class="t">${esc(e.n)}</div><div><span class="sr">${x.done.length} × ${esc(e.r)}</span> <span class="mut">· pausa ${e.rest?(e.rest>=60?(e.rest/60)+"'":e.rest+'"'):'–'}</span></div></div></div>`;
+  h+=`<div class="ex ${all?'alldone':''}"><div class="exh"><span class="n">${all?ic('check'):String(num).padStart(2,'0')}</span><div><div class="t">${esc(e.n)}</div><div><span class="sr">${x.done.length} × ${esc(e.r)}</span> <span class="mut">· pausa ${e.rest?(e.rest>=60?(e.rest/60)+"'":e.rest+'"'):'–'}</span></div><button class="howl" data-act="how" data-id="${e.id}">${ic('info')} Cómo se hace</button></div>${thumb(e.id)}</div>`;
   if(e.note)h+=`<div class="note">${esc(e.note)}</div>`;
   if(e.items)h+=`<ol class="l">${e.items.map(it=>`<li>${esc(it.n)}</li>`).join('')}</ol>`;
   h+=`<div class="sets">${x.done.map((v,k)=>`<button class="set ${v?'on':''}" data-act="set" data-id="${e.id}" data-k="${k}">${k+1}</button>`).join('')}</div>`;
@@ -660,7 +715,7 @@ function renderAjustes(){
  <li>La bici Z2 se corre al primer día libre; si no entra, se estira la del domingo.</li>
  <li>Cada lunes: con 2 o 3 sesiones avanzás de semana del bloque; con menos, se repite.</li>
  <li>Cargas: "Sobró" sube, "Justo" sube en semanas 2 y 3, "No llegué" repite o baja.</li></ul></div>`;
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v5</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v6</div>`;
  return h}
 
 /* ============ Render ============ */
@@ -707,6 +762,7 @@ document.addEventListener('click',e=>{
  case 'nopuedo':replanDo(()=>{S.unav[d]=true});break;
  case 'canday':replanDo(()=>{delete S.unav[d]});break;
  case 'dayopt':dayOptions(d);break;
+ case 'how':howSheet(id);break;
  case 'quicklog':if(v==='MOTO'){motoSheet(d);break}if(['Z2','SUB','REC'].includes(v)){biciSheet(d,v);break}replanDo(()=>{S.log[d]={type:v,status:'done',quick:true};delete S.unav[d];delete S.swap[d]});break;
  case 'unlog':if(confirm('¿Borrar el registro del '+fmtD(d)+'?'))replanDo(()=>{delete S.log[d]});break;
  case 'actdone':{const m=$('#actmin'),mn=m&&m.value?+m.value:null;replanDo(()=>{if(['Z2','SUB','REC','BICI'].includes(v))S.bici[todayStr()]={min:mn,tipo:v==='BICI'?'Z2':v,notas:''};else S.log[todayStr()]={type:v,status:'done',min:mn}});break}
