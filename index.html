@@ -268,6 +268,7 @@ const SES={
   {id:'a1',n:'Sentadilla trasera',s:4,r:'5 @RPE 8',rest:180,kg:1,inc:5,core:1},
   {id:'a2',n:'Peso muerto rumano',s:3,r:'8',rest:120,kg:1,inc:5,core:1},
   {id:'a3',n:'Búlgara con mancuernas',s:3,r:'8 por pierna',rest:90,kg:1,inc:2,core:1,note:'kg por mancuerna'},
+  {id:'a7',n:'Nordic de isquiotibiales',s:2,r:'4-5',rest:90,note:'Bajá lo más lento posible. La primera semana, 1 serie de 3.'},
   {id:'a4',grip:1,n:'Isométrico "parado en pedalines"',s:3,r:'45-60"',rest:90,kg:1,inc:2,secs:50,core:1,note:'Posición de ataque agarrando una barra al frente, como el manubrio. kg = barra + discos. Específico moto.'},
   {id:'a5',grip:1,n:'Suitcase carry pesado',s:3,r:'30 m por lado',rest:60,kg:1,inc:2,note:'Lumbar y oblicuos'},
   {id:'a6',n:'Pallof press en polea',s:3,r:'10 por lado',rest:45,kg:1,inc:2.5}]},
@@ -277,17 +278,18 @@ const SES={
   {id:'b3',n:'Press de hombro (mancuerna de pie o landmine)',s:3,r:'8',rest:120,kg:1,inc:2,core:1},
   {id:'b4',n:'Face pull',s:3,r:'15',rest:60,kg:1,inc:2.5},
   {id:'b5',n:'Rotación externa en polea',s:2,r:'15',rest:45,kg:1,inc:1},
-  {id:'b6',n:'Turkish get-up con pesa rusa',s:3,r:'2 por lado',rest:90,kg:1,inc:4,core:1,note:'Clave para los trabados'},
   {id:'b7',grip:1,n:'Dead hang',s:3,r:'máx',rest:90,meas:'seg',core:1,note:'Manos al ancho del manubrio. Anotá tu mejor tiempo.'},
   {id:'b8',grip:1,n:'Wrist roller',s:3,r:'subidas',rest:60,kg:1,inc:1,note:'Palmas hacia abajo, como acelerando'},
-  {id:'b9',n:'Extensores con banda',s:2,r:'20',rest:0,note:'Equilibra el antebrazo'}]},
+  {id:'b9',n:'Extensores con banda',s:2,r:'20',rest:0,note:'Equilibra el antebrazo'},
+  {id:'b10',n:'Isométricos de cuello',s:2,r:'10" x 4 direcciones',rest:30,note:'Apretá al 50-60 % contra tu mano, sin mover la cabeza.'}]},
  C:{name:'Gym C',title:'Circuito enduro',min:55,warm:"5' de bici fija subiendo de a poco + movilidad general. Hoy nada al fallo.",ex:[
   {id:'c1',n:'Press banca',s:3,r:'6',rest:90,kg:1,inc:2.5,core:1,grp:'Bloque 1 · superserie con remo'},
   {id:'c2',grip:1,n:'Remo con mancuerna',s:3,r:'10 por lado',rest:90,kg:1,inc:2,core:1,grp:'Bloque 1 · superserie con press'},
   {id:'c3',grip:1,n:'Circuito "especial"',s:5,r:'rondas',rest:90,circuit:1,core:1,meas:'min',grp:'Bloque 2',note:'El agarre trabaja cansado y con pulsaciones altas: así es el arm pump real. Anotá el tiempo total (min).',items:[
     {n:'Bici fija 60" fuerte',h:'bf'},{n:'Swing con pesa rusa x15',id:'c3sw',inc:4,h:'sw'},{n:'Farmer carry moderado 30 m',id:'c3fc',inc:2,h:'fc'},{n:'Flexiones x12',h:'pu'},{n:'Sentadilla isométrica 30"',h:'iso'}]},
-  {id:'c4',n:'Rueda abdominal',s:3,r:'10',rest:60,grp:'Bloque 3 · core'},
-  {id:'c5',n:'Plancha lateral',s:3,r:'40" por lado',rest:45,secs:40,grp:'Bloque 3 · core'}]}
+  {id:'c6',n:'Equilibrio en una pierna',s:2,r:'30" por pierna',rest:30,grp:'Bloque 3 · equilibrio y core'},
+  {id:'c7',n:'Aterrizajes a una pierna',s:2,r:'6 por pierna',rest:60,grp:'Bloque 3 · equilibrio y core'},
+  {id:'c5',n:'Plancha lateral',s:3,r:'40" por lado',rest:45,secs:40,grp:'Bloque 3 · equilibrio y core'}]}
 };
 // Cómo se hace cada ejercicio. Fotos: free-exercise-db (dominio público), en img/ex/. f = aclaración cuando la foto no es exacta.
 const HOW={
@@ -314,6 +316,10 @@ const HOW={
  fc:{img:['a5-0','a5-1'],m:'Agarre y trapecios',c:['Una pesa en cada mano, con un peso que puedas llevar sin apretar al máximo: el Gym C cae cerca de la moto.','Caminá derecho con pasos cortos y los hombros atrás.']},
  pu:{img:['pu-0','pu-1'],m:'Pecho, tríceps y zona media',c:['Manos un poco más abiertas que los hombros, cuerpo recto como una tabla.','Bajá hasta que el pecho casi toque el piso y subí.','Si no salen, con las rodillas apoyadas.']},
  iso:{img:['a4-1'],m:'Cuádriceps',f:'Igual que en la foto, pero sin peso.',c:['Media sentadilla quieta durante 30 segundos, sin peso ni barra: el agarre descansa para llegar fresco a la moto.']},
+ a7:{img:['nd-0','nd-1'],m:'Atrás del muslo (isquios): protege de desgarros',f:'En la foto los pies están trabados en una máquina: en el gym sirve una barra baja, una espaldera o un compañero que te sostenga los tobillos.',c:['De rodillas sobre una colchoneta, con los tobillos trabados.','Cuerpo recto de rodillas a cabeza; bajá hacia adelante lo más lento que puedas, frenando con la parte de atrás del muslo.','Cuando no aguantes más, caé sobre las manos como en una flexión y empujá para volver.','Pocas repeticiones y muy lentas: es lo que funciona.']},
+ b10:{img:['nk-0','nk-1'],m:'Cuello',c:['Sentado o parado derecho, apoyá la mano en la frente.','Empujá con la cabeza contra la mano al 50-60 % de tu fuerza, sin que la cabeza se mueva, 10 segundos.','Repetí con la mano atrás de la cabeza y a cada costado: 4 direcciones.']},
+ c6:{img:[],m:'Tobillos y rodillas: equilibrio',c:['Parado en una pierna sobre una colchoneta o almohadón, rodilla apenas flexionada.','Aguantá 30 segundos sin apoyar el otro pie. Cambiá de pierna.','Cuando sea fácil, hacelo con los ojos cerrados o moviendo los brazos.']},
+ c7:{img:[],m:'Rodillas y tobillos: aterrizar bien',c:['Subite a un cajón o escalón bajo (20-30 cm).','Bajá dando un paso y caé en UNA pierna, frenando el aterrizaje en 2 segundos.','La rodilla apunta al pie, sin irse para adentro. Cadera atrás, como en media sentadilla.','6 por pierna. Arrancá bajito y subí la altura de a poco.']},
  c4:{img:['c4-0','c4-1'],m:'Abdominales',c:['De rodillas, con la rueda en el piso debajo de los hombros.','Rodá hacia adelante estirando el cuerpo hasta donde puedas sin que se hunda la espalda baja.','Volvé tirando con el abdomen.']},
  c5:{img:['c5-0','c5-1'],m:'Oblicuos y cadera',c:['De costado, apoyado en el antebrazo (codo debajo del hombro) y en el costado de los pies.','Levantá la cadera hasta que el cuerpo quede recto.','Aguantá 40 segundos y cambiá de lado.']}
 };
@@ -328,9 +334,9 @@ function howSheet(id){
  sheet(x+`<button class="btn ghost" data-act="closesheet">Cerrar</button>`)}
 const ACT={
  Z2:{name:'Bici Z2',title:'Bici afuera, 75 a 120 min',li:['Ritmo en el que podés hablar en frases completas.','La base aeróbica es lo que más baja el arm pump.','Si hay MTB, mejor que la de ruta: suma agarre y trabajo parado.']},
- SUB:{name:'Bici: subidas',title:"6 x 3' fuerte / 3' suave",li:["Toca cada 2 semanas en lugar del Z2.","Entrada en calor de 15' suave antes.","Si hay MTB, mejor: subidas paradas en los pedales."]},
+ SUB:{name:'Bici con subidas',title:"Z2 con 4 x 3' fuertes en subida",li:["Salida de 75 a 120 min, casi toda en Z2.","En el medio, 4 subidas de 3' fuertes (podés hablar solo con palabras sueltas) con 3' suaves entre cada una.","La moto lleva el corazón al 90 % o más: esto lo entrena. En semana de descarga, solo Z2."]},
  REST:{name:'Descanso',title:'O 30 min de bici suave + movilidad',li:['Nada pesado: mañana hay moto.','Movilidad de cadera, hombros y muñecas.']},
- REC:{name:'Recuperación',title:'Bici suave 45-60 min (Z1-Z2) + movilidad torácica',li:['Nada de exigirse.','Post-moto: movilidad torácica y face pull liviano 2x20.']},
+ REC:{name:'Recuperación',title:'Bici suave 45-60 min (Z1-Z2) + movilidad torácica',li:['Nada de exigirse. Si es en bici, que sea plana: nada de MTB técnico, el antebrazo todavía está cansado.','Movilidad (8 min): libro abierto 2x8 por lado y 90/90 de cadera 2x6 por lado.','Post-moto: movilidad torácica y face pull liviano 2x20.']},
  MOTO:{name:'MOTO',title:'Sábado de enduro',li:[]},
  BICI:{name:'Bici',title:'Salida planeada',li:['Si es larga, que sea Z2: podés hablar en frases completas.','Si hay MTB, mejor: suma agarre y trabajo parado.']},
  LIBRE:{name:'Libre',title:'Descanso, o bici suave si tenés ganas',li:['No hace falta recuperar nada hoy.']}
@@ -415,7 +421,7 @@ function planWeek(mon){
  const fresh=S.start&&S.start>mon; // arrancó a mitad de semana: no reclamar lo anterior
  for(const g in best.a){if(best.a[g]==null){if(!fresh)dropped.push(g)}else gymAt[best.a[g]]=g}
  // bici de la semana: una planeada reemplaza al Z2 del martes
- const bike=(isoWeek(mon)%2===0&&S.block.week!==4&&!S.retorno)?'SUB':'Z2';
+ const bike=(S.block.week!==4&&!S.retorno)?'SUB':'Z2'; // intervalos todas las semanas, salvo descarga o modo vuelta
  const bikeDone=days.some(p=>(S.bici[p.date]&&S.bici[p.date].tipo!=='REC')||(p.log&&p.log.status==='done'&&(p.log.type==='Z2'||p.log.type==='SUB')));
  const bp=days.filter(p=>!p.past&&bikePlan(p.date)&&!S.bici[p.date]).map(p=>p.i);
  let bikeDay=null,bikeOnSun=false;
@@ -497,7 +503,7 @@ function togglePlan(d,v){const mon=mondayOf(d);
 function daysSinceMoto(){const t=todayStr();for(let i=0;i<=60;i++)if(motoAt(addDays(t,-i)))return i;return null}
 function lastMoto(){const t=todayStr();for(let i=1;i<=8;i++){const d=addDays(t,-i),m=motoAt(d);if(m)return{d,m}}return null}
 // Cómo quedaste después de la moto: escala 1 a 5, más alto = peor (más cargado o dolorido).
-const ZONAS=[['pump','Antebrazos (arm pump)','Qué tan duros se pusieron mientras andabas'],['gemelos','Gemelos'],['piernas','Piernas (muslos)'],['gluteos','Glúteos'],['espalda','Espalda media / alta'],['hombros','Hombros'],['general','Cansancio general']];
+const ZONAS=[['pump','Antebrazos (arm pump)','Qué tan duros se pusieron mientras andabas'],['gemelos','Gemelos'],['piernas','Piernas (muslos)'],['gluteos','Glúteos'],['espalda','Espalda media / alta'],['lumbar','Espalda baja (lumbar)'],['hombros','Hombros'],['general','Cansancio general']];
 const NIV=['Nada','Poco','Medio','Mucho','Al límite'];
 function z5(m,k){const v=+m[k];return !v?0:m.esc===5?v:Math.ceil(v/2)} // las salidas viejas estaban de 1 a 10
 const scale=(k,v)=>`<div class="scl" id="z-${k}">${NIV.map((l,i)=>`<button class="chip lv${i+1} ${+v===i+1?'on':''}" data-act="mpick" data-v="${i+1}"><b>${i+1}</b><small>${l}</small></button>`).join('')}</div>`;
@@ -740,7 +746,7 @@ function renderAjustes(){
  <li>La bici Z2 se corre al primer día libre; si no entra, se estira la del domingo.</li>
  <li>Cada lunes: con 2 o 3 sesiones avanzás de semana del bloque; con menos, se repite.</li>
  <li>Cargas: "Sobró" sube, "Justo" sube en semanas 2 y 3, "No llegué" repite o baja.</li></ul></div>`;
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v9</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v10</div>`;
  return h}
 
 /* ============ Render ============ */
