@@ -268,7 +268,7 @@ const SES={
   {id:'a1',n:'Sentadilla trasera',s:4,r:'5 @RPE 8',rest:180,kg:1,inc:5,core:1},
   {id:'a2',n:'Peso muerto rumano',s:3,r:'8',rest:120,kg:1,inc:5,core:1},
   {id:'a3',n:'Búlgara con mancuernas',s:3,r:'8 por pierna',rest:90,kg:1,inc:2,core:1,note:'kg por mancuerna'},
-  {id:'a4',n:'Isométrico "parado en pedalines"',s:3,r:'45-60"',rest:90,kg:1,inc:2,secs:50,core:1,note:'Media sentadilla con mancuernas, rodillas a ~110°. Específico moto.'},
+  {id:'a4',n:'Isométrico "parado en pedalines"',s:3,r:'45-60"',rest:90,kg:1,inc:2,secs:50,core:1,note:'Posición de ataque agarrando una barra al frente, como el manubrio. kg = barra + discos. Específico moto.'},
   {id:'a5',n:'Suitcase carry pesado',s:3,r:'30 m por lado',rest:60,kg:1,inc:2,note:'Lumbar y oblicuos'},
   {id:'a6',n:'Pallof press en polea',s:3,r:'10 por lado',rest:45,kg:1,inc:2.5}]},
  B:{name:'Gym B',title:'Espalda alta, hombros, agarre',min:70,warm:"Remo o bici 5', band pull-aparts 2x15, rotaciones de hombro.",ex:[
@@ -278,14 +278,14 @@ const SES={
   {id:'b4',n:'Face pull',s:3,r:'15',rest:60,kg:1,inc:2.5},
   {id:'b5',n:'Rotación externa en polea',s:2,r:'15',rest:45,kg:1,inc:1},
   {id:'b6',n:'Turkish get-up con pesa rusa',s:3,r:'2 por lado',rest:90,kg:1,inc:4,core:1,note:'Clave para los trabados'},
-  {id:'b7',n:'Dead hang',s:3,r:'máx',rest:90,meas:'seg',core:1,note:'Agarre. Anotá tu mejor tiempo.'},
-  {id:'b8',n:'Wrist roller',s:3,r:'subidas',rest:60,kg:1,inc:1,note:'Agarre'},
+  {id:'b7',n:'Dead hang',s:3,r:'máx',rest:90,meas:'seg',core:1,note:'Manos al ancho del manubrio. Anotá tu mejor tiempo.'},
+  {id:'b8',n:'Wrist roller',s:3,r:'subidas',rest:60,kg:1,inc:1,note:'Palmas hacia abajo, como acelerando'},
   {id:'b9',n:'Extensores con banda',s:2,r:'20',rest:0,note:'Equilibra el antebrazo'}]},
  C:{name:'Gym C',title:'Circuito enduro',min:55,warm:"5' de bici fija subiendo de a poco + movilidad general. Hoy nada al fallo.",ex:[
   {id:'c1',n:'Press banca',s:3,r:'6',rest:90,kg:1,inc:2.5,core:1,grp:'Bloque 1 · superserie con remo'},
   {id:'c2',n:'Remo con mancuerna',s:3,r:'10 por lado',rest:90,kg:1,inc:2,core:1,grp:'Bloque 1 · superserie con press'},
   {id:'c3',n:'Circuito "especial"',s:5,r:'rondas',rest:90,circuit:1,core:1,meas:'min',grp:'Bloque 2',note:'El agarre trabaja cansado y con pulsaciones altas: así es el arm pump real. Anotá el tiempo total (min).',items:[
-    {n:'Bici fija 60" fuerte',h:'bf'},{n:'Swing con pesa rusa x15',id:'c3sw',inc:4,h:'sw'},{n:'Farmer carry pesado 30 m',id:'c3fc',inc:2,h:'fc'},{n:'Flexiones x12',h:'pu'},{n:'Sentadilla isométrica 30"',h:'iso'}]},
+    {n:'Bici fija 60" fuerte',h:'bf'},{n:'Swing con pesa rusa x15',id:'c3sw',inc:4,h:'sw'},{n:'Farmer carry pesado 30 m',id:'c3fc',inc:2,h:'fc'},{n:'Flexiones x12',h:'pu'},{n:'Posición de ataque con barra 30"',h:'iso'}]},
   {id:'c4',n:'Rueda abdominal',s:3,r:'10',rest:60,grp:'Bloque 3 · core'},
   {id:'c5',n:'Plancha lateral',s:3,r:'40" por lado',rest:45,secs:40,grp:'Bloque 3 · core'}]}
 };
@@ -294,7 +294,7 @@ const HOW={
  a1:{img:['a1-0','a1-1'],m:'Piernas, glúteos y zona media',c:['Barra apoyada arriba de la espalda (sobre los trapecios), no en el cuello.','Pies al ancho de los hombros, puntas un poco hacia afuera.','Bajá como sentándote atrás, hasta que la cadera quede a la altura de las rodillas o un poco más abajo.','Rodillas en la misma dirección que las puntas; pecho arriba y espalda firme.','Subí empujando el piso con todo el pie.']},
  a2:{img:['a2-0','a2-1'],m:'Atrás del muslo (isquios), glúteos y lumbares',c:['Parado con la barra en las manos, rodillas apenas flexionadas y fijas.','Llevá la cola hacia atrás, como cerrando una puerta con la cola. La barra baja pegada a las piernas.','Bajá hasta sentir que tira atrás del muslo (más o menos debajo de las rodillas), siempre con la espalda recta.','Volvé apretando los glúteos.']},
  a3:{img:['a3-0','a3-1'],m:'Cuádriceps, glúteos y equilibrio',f:'En la foto el pie de atrás está en el piso: en la búlgara va apoyado en un banco.',c:['Empeine del pie de atrás apoyado en un banco; el de adelante, un paso largo por delante.','Bajá recto hasta que el muslo de adelante quede casi paralelo al piso.','El peso va en la pierna de adelante; la de atrás solo equilibra.','Hacé todas las repeticiones con una pierna y después cambiá.']},
- a4:{img:['a4-1'],m:'Cuádriceps y aguante en la posición de manejo',c:['Mancuernas colgando a los costados. Bajá a media sentadilla (rodillas a unos 110°, como en la foto) y quedate quieto.','Como parado en los pedalines: pecho adelante, rodillas un poco abiertas, peso en la parte de adelante del pie.','Respirá normal y aguantá 45 a 60 segundos.']},
+ a4:{img:['a4-1'],m:'Cuádriceps y agarre, juntos como en la moto',f:'En la foto las mancuernas cuelgan a los costados: acá agarrás una barra al frente, como el manubrio.',c:['Barra liviana o EZ (10 a 20 kg) agarrada con las palmas hacia abajo, manos al ancho del manubrio. Si tenés un manubrio viejo con puños, mejor.','Bajá a media sentadilla (rodillas a unos 110°) con la barra al frente a la altura del manubrio y los codos afuera.','Pecho adelante, peso en la parte de adelante del pie, como parado en los pedalines.','Agarre firme pero sin estrujar: el mismo que querés tener en la moto. Aguantá 45 a 60 segundos respirando normal.']},
  a5:{img:['a5-0','a5-1'],m:'Oblicuos, lumbares y agarre',f:'La foto es con dos pesas: acá se hace con una sola, como si llevaras una valija.',c:['Una sola pesa pesada en una mano.','Caminá derecho sin inclinarte hacia el lado de la pesa: el ejercicio es mantenerte recto.','30 m con una mano, cambiás de mano y volvés.']},
  a6:{img:['a6-0','a6-1'],m:'Abdominales y oblicuos (anti-rotación)',c:['De costado a la polea, manija a la altura del pecho, agarrada con las dos manos.','Empujá los brazos al frente y aguantá 2 segundos sin dejar que la polea te gire el torso.','Volvé al pecho despacio. El tronco no se mueve en todo el ejercicio.','Hacé un lado y después el otro.']},
  b1:{img:['b1-0','b1-1'],m:'Espalda (dorsales), bíceps y agarre',c:['Agarre un poco más ancho que los hombros, palmas hacia adelante.','Peso colgado de un cinturón, o una mancuerna apretada entre los pies.','Subí hasta pasar el mentón por arriba de la barra; bajá controlado hasta estirar los brazos.','Si con peso no salen 5, hacelas sin lastre.']},
@@ -303,8 +303,8 @@ const HOW={
  b4:{img:['b4-0','b4-1'],m:'Hombro de atrás y espalda alta',c:['Polea alta con soga.','Tirá la soga hacia la cara separando las manos, con los codos altos (a la altura de los hombros).','Al final las manos quedan a los costados de la cabeza, como mostrando bíceps.','Peso liviano y controlado. Corrige la postura encorvada de la moto.']},
  b5:{img:['b5-0','b5-1'],m:'Manguito rotador (protege el hombro)',c:['Polea a la altura del codo, de costado.','Codo pegado al cuerpo y doblado a 90°. Ayuda poner una toalla enrollada entre el codo y las costillas.','Girá el antebrazo hacia afuera, como abriendo una puerta, sin despegar el codo.','Peso muy liviano.']},
  b6:{img:['b6-0','b6-1'],m:'Hombros, zona media y coordinación',c:['Acostado boca arriba, pesa rusa en una mano y ese brazo estirado hacia el techo.','Te levantás hasta quedar parado y volvés a acostarte, siempre con el brazo arriba y mirando la pesa.','Orden: apoyás el codo, después la mano, levantás la cadera, pasás la pierna por debajo, rodilla, y te parás.','Lento y con poco peso hasta aprenderlo. Te sirve para levantarte con la moto trabada.']},
- b7:{img:['b7-0'],m:'Agarre y antebrazos',f:'En la foto el agarre está tapado por la barra de adelante: es colgarse quieto.',c:['Colgate de la barra con los brazos estirados.','Hombros activos (no del todo sueltos) y agarre firme.','Aguantá lo más que puedas y anotá los segundos. Ayuda contra el arm pump.']},
- b8:{img:['b8-0','b8-1'],m:'Antebrazos',c:['Brazos estirados al frente, agarrando el palo.','Enrollá la soga girando las muñecas hasta que la pesa llegue arriba.','Después desenrollá despacio para que baje. Una subida y una bajada es una serie.']},
+ b7:{img:['b7-0'],m:'Agarre y antebrazos',f:'En la foto el agarre está tapado por la barra de adelante: es colgarse quieto.',c:['Colgate de la barra con las palmas hacia adelante y las manos al ancho del manubrio (unos 80 cm), no más juntas.','Brazos estirados, hombros activos (no del todo sueltos) y agarre firme.','Aguantá lo más que puedas y anotá los segundos.']},
+ b8:{img:['b8-0','b8-1'],m:'Antebrazos (el gesto de acelerar)',c:['Brazos estirados al frente, agarrando el palo con las palmas hacia abajo, como el manubrio.','Enrollá la soga girando las muñecas hacia vos, como cuando acelerás, hasta que la pesa llegue arriba.','Después desenrollá despacio para que baje. Una subida y una bajada es una serie.']},
  b9:{img:[],m:'Músculos que abren la mano',c:['Poné una gomita alrededor de los cinco dedos, con las puntas juntas.','Abrí los dedos lo más que puedas contra la goma y cerrá despacio.','20 repeticiones. Equilibra todo el trabajo de agarre.']},
  c1:{img:['c1-0','c1-1'],m:'Pecho, hombros y tríceps',c:['Acostado en el banco, pies firmes en el piso, omóplatos juntos y apretados contra el banco.','Bajá la barra hasta rozar el pecho (a la altura del esternón), con los codos a unos 45° del cuerpo.','Empujá hasta estirar los brazos.','Si vas pesado, que alguien te asista.']},
  c2:{img:['c2-0','c2-1'],m:'Dorsales, espalda alta y bíceps',c:['Rodilla y mano del mismo lado apoyadas en el banco, espalda plana.','Tirá la mancuerna hacia la cadera, con el codo cerca del cuerpo.','Bajá hasta estirar el brazo del todo.']},
@@ -313,7 +313,7 @@ const HOW={
  sw:{img:['sw-0','sw-1'],m:'Glúteos, isquios, agarre y pulsaciones',f:'La foto es con una mano: hacelo con las dos.',c:['Pesa rusa entre las piernas; la cadera va atrás, como en el rumano.','Empujá la cadera fuerte hacia adelante: la pesa sube sola hasta la altura del pecho.','Los brazos solo guían; la fuerza sale de la cadera.']},
  fc:{img:['a5-0','a5-1'],m:'Agarre y trapecios',c:['Una pesa pesada en cada mano.','Caminá derecho con pasos cortos y los hombros atrás.']},
  pu:{img:['pu-0','pu-1'],m:'Pecho, tríceps y zona media',c:['Manos un poco más abiertas que los hombros, cuerpo recto como una tabla.','Bajá hasta que el pecho casi toque el piso y subí.','Si no salen, con las rodillas apoyadas.']},
- iso:{img:['a4-1'],m:'Cuádriceps',f:'Igual que en la foto, pero sin peso.',c:['Media sentadilla quieta durante 30 segundos.']},
+ iso:{img:['a4-1'],m:'Cuádriceps y agarre cansados, como el arm pump real',f:'En la foto van mancuernas a los costados: acá es una barra al frente, como el manubrio.',c:['La misma posición de ataque del Gym A: barra al frente agarrada como el manubrio, media sentadilla.','30 segundos quieto, con los antebrazos ya cansados del farmer carry.']},
  c4:{img:['c4-0','c4-1'],m:'Abdominales',c:['De rodillas, con la rueda en el piso debajo de los hombros.','Rodá hacia adelante estirando el cuerpo hasta donde puedas sin que se hunda la espalda baja.','Volvé tirando con el abdomen.']},
  c5:{img:['c5-0','c5-1'],m:'Oblicuos y cadera',c:['De costado, apoyado en el antebrazo (codo debajo del hombro) y en el costado de los pies.','Levantá la cadera hasta que el cuerpo quede recto.','Aguantá 40 segundos y cambiá de lado.']}
 };
@@ -735,7 +735,7 @@ function renderAjustes(){
  <li>La bici Z2 se corre al primer día libre; si no entra, se estira la del domingo.</li>
  <li>Cada lunes: con 2 o 3 sesiones avanzás de semana del bloque; con menos, se repite.</li>
  <li>Cargas: "Sobró" sube, "Justo" sube en semanas 2 y 3, "No llegué" repite o baja.</li></ul></div>`;
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v7</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v8</div>`;
  return h}
 
 /* ============ Render ============ */
