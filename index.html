@@ -227,6 +227,17 @@ ol.how{margin:12px 0 4px;padding:0;list-style:none;counter-reset:s}
 ol.how li{counter-increment:s;position:relative;padding:9px 0 9px 36px;border-top:1px solid var(--line);font-size:15px}
 ol.how li:first-child{border-top:0}
 ol.how li::before{content:counter(s);position:absolute;left:0;top:9px;width:24px;height:24px;border-radius:8px;background:var(--accbg);color:var(--acc2);font:800 14px/24px var(--disp);text-align:center}
+
+/* escala 1 a 5 */
+.scl{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.scl .chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;border-radius:12px;margin:0}
+.scl .chip b{font:800 19px/1 var(--disp)}.scl .chip small{font-size:10.5px;font-weight:600;color:var(--mut);white-space:nowrap}
+.scl .chip.on small{color:inherit}
+.scl .lv1.on{background:#35c776;border-color:#35c776;color:#04210f}.scl .lv2.on{background:#a3d94b;border-color:#a3d94b;color:#1a2405}
+.scl .lv3.on{background:#f5b83d;border-color:#f5b83d;color:#2a1d02}.scl .lv4.on{background:#ff8a3d;border-color:#ff8a3d;color:#2a1103}
+.scl .lv5.on{background:#f0565a;border-color:#f0565a;color:#fff}
+.scalehint{display:flex;align-items:center;gap:8px;font:600 12px var(--body);color:var(--mut)}
+.scalehint i{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#35c776,#a3d94b,#f5b83d,#ff8a3d,#f0565a)}
 </style>
 </head>
 <body>
@@ -482,7 +493,12 @@ function togglePlan(d,v){const mon=mondayOf(d);
  if(S.plan[d]===v)delete S.plan[d];else S.plan[d]=v;delete S.unav[d]}
 function daysSinceMoto(){const t=todayStr();for(let i=0;i<=60;i++)if(motoAt(addDays(t,-i)))return i;return null}
 function lastMoto(){const t=todayStr();for(let i=1;i<=8;i++){const d=addDays(t,-i),m=motoAt(d);if(m)return{d,m}}return null}
-const chips10=v=>[...Array(10)].map((_,i)=>`<button class="chip ${+v===i+1?'on':''}" data-act="mpick" data-v="${i+1}">${i+1}</button>`).join('');
+// Cómo quedaste después de la moto: escala 1 a 5, más alto = peor (más cargado o dolorido).
+const ZONAS=[['pump','Antebrazos (arm pump)','Qué tan duros se pusieron mientras andabas'],['gemelos','Gemelos'],['piernas','Piernas (muslos)'],['gluteos','Glúteos'],['espalda','Espalda media / alta'],['hombros','Hombros'],['general','Cansancio general']];
+const NIV=['Nada','Poco','Medio','Mucho','Al límite'];
+function z5(m,k){const v=+m[k];return !v?0:m.esc===5?v:Math.ceil(v/2)} // las salidas viejas estaban de 1 a 10
+const scale=(k,v)=>`<div class="scl" id="z-${k}">${NIV.map((l,i)=>`<button class="chip lv${i+1} ${+v===i+1?'on':''}" data-act="mpick" data-v="${i+1}"><b>${i+1}</b><small>${l}</small></button>`).join('')}</div>`;
+const ZN=k=>ZONAS.find(z=>z[0]===k)[1].replace(/ \(.*\)/,'');
 function actQuick(){
  const n=daysSinceMoto(),t=todayStr();
  const last=n==null?'sin registrar':n===0?'hoy':n===1?'ayer':'hace '+n+' días ('+fmtD(addDays(t,-n))+')';
@@ -497,8 +513,10 @@ function biciSheet(d,tipo){const b=S.bici[d]||{},tp=b.tipo||tipo||'Z2';
 function motoSheet(d){const m=S.moto[d]||(motoAt(d)||{}),t=todayStr();
  sheet(`<h1>Moto · ${fmtD(d)}</h1>
  <div class="q"><div class="k">Horas</div><input type="number" id="mh" inputmode="decimal" step="0.5" placeholder="ej. 1.5" value="${esc(m.horas)}"></div>
- <div class="q"><div class="k">Arm pump (1 a 10)</div><div class="chips" id="mp">${chips10(m.pump)}</div></div>
- ${d<t?`<div class="q"><div class="k">Espalda alta al otro día (1 a 10)</div><div class="chips" id="me">${chips10(m.espalda)}</div></div>`:'<div class="note">La espalda alta te la pregunto mañana.</div>'}
+ <h2>¿Cómo quedaste?</h2>
+ <div class="scalehint"><span>1 · nada</span><i></i><span>5 · al límite</span></div><div class="note" style="margin-top:2px">Más alto = más cargado o dolorido. Lo que no sientas, dejalo vacío.</div>
+ ${ZONAS.map(([k,l,sub])=>`<div class="q"><div class="k">${l}</div>${sub?`<div class="mut">${sub}</div>`:''}${scale(k,z5(m,k))}</div>`).join('')}
+ ${d===t?'<div class="ban" style="margin-top:4px">Las molestias suelen aparecer al otro día: mañana te pregunto de nuevo en Hoy.</div>':''}
  <div class="q"><div class="k">Notas</div><textarea id="mn" placeholder="Terreno, qué costó, setup...">${esc(m.notas)}</textarea></div>
  <div class="note">Si no te acordás de algo, dejalo vacío: lo importante es el día.</div>
  <button class="btn" data-act="motosave" data-d="${d}">Guardar</button>${motoAt(d)?`<button class="btn ghost" data-act="motodel" data-d="${d}">Borrar esta salida</button>`:''}<button class="btn ghost" data-act="closesheet">Cancelar</button>`)}
@@ -510,12 +528,14 @@ function renderHoy(){
  if(S.weekMsg)h+=`<div class="ban"><button data-act="dismiss">✕</button>${esc(S.weekMsg)}</div>`;
  if(S.draft&&S.draft.date!==t)h+=`<div class="ban warn">Quedó sin terminar ${SES[S.draft.type].name} del ${fmtD(S.draft.date)}.<div class="row"><button class="btn sm" data-act="resume">Abrir y terminar</button><button class="btn sm ghost" data-act="discard">Descartar</button></div></div>`;
  const lm=lastMoto();
- if(lm&&+lm.m.pump>=7)h+=`<div class="ban warn">Arm pump ${lm.m.pump}/10 el ${fmtD(lm.d)}. Esta semana no saltees la bici Z2 (es lo que más lo baja) y salí suave los primeros 15'.</div>`;
- if(lm&&+lm.m.espalda>=7)h+=`<div class="ban warn">Espalda alta ${lm.m.espalda}/10 después de la moto. Revisá el setup (Ajustes → checklist) y sumá face pull + movilidad torácica.</div>`;
+ if(lm&&z5(lm.m,'pump')>=4)h+=`<div class="ban warn">Arm pump ${z5(lm.m,'pump')}/5 (${NIV[z5(lm.m,'pump')-1].toLowerCase()}) el ${fmtD(lm.d)}. Esta semana no saltees la bici Z2 (es lo que más lo baja) y salí suave los primeros 15'.</div>`;
+ if(lm&&z5(lm.m,'espalda')>=4)h+=`<div class="ban warn">Espalda ${z5(lm.m,'espalda')}/5 después de la moto. Revisá el setup (Ajustes → checklist) y sumá face pull + movilidad torácica.</div>`;
  if(P.dropped.length)h+=`<div class="ban bad">Esta semana no entra ${P.dropped.map(g=>SES[g].name).join(' ni ')} sin pisar la moto. No la fuerces: el lunes arranca de nuevo.<ul class="l">${P.dropped.map(g=>'<li>'+DROPTIP[g]+'</li>').join('')}</ul></div>`;
- const ym=S.moto[addDays(t,-1)];
- if(ym&&!ym.espalda){
-  h+=`<div class="card"><div class="k">¿Cómo amaneció la espalda alta después de la moto?</div><div class="chips">${[...Array(10)].map((_,i)=>`<button class="chip" data-act="espalda" data-v="${i+1}">${i+1}</button>`).join('')}</div><div class="note">1 = nada, 10 = muy dolorida</div></div>`}
+ if(lm&&lm.d>=addDays(t,-2)){const hi=ZONAS.map(z=>z[0]).filter(k=>k!=='pump'&&k!=='espalda'&&z5(lm.m,k)>=4);
+  if(hi.length)h+=`<div class="ban warn">Quedaste cargado después de la moto del ${fmtD(lm.d)}: ${hi.map(k=>ZN(k).toLowerCase()+' '+z5(lm.m,k)+'/5').join(', ')}. Si hoy toca gym, elegí la versión liviana y sumá movilidad.</div>`}
+ const yd=addDays(t,-1),ym=S.moto[yd];
+ if(ym&&!ZONAS.some(([k])=>k!=='pump'&&z5(ym,k)))
+  h+=`<div class="card"><div class="hh" style="margin:0">${badge('MOTO')}<div><div class="k">¿Cómo amaneciste después de la moto de ayer?</div><div class="mut">Piernas, espalda, hombros... del 1 al 5. Tarda 20 segundos.</div></div></div><button class="btn ghost" data-act="motoask" data-d="${yd}">Completar</button></div>`;
  h+=weekStrip(P);
  h+=heroCard(p,P);
  // mañana
@@ -689,7 +709,7 @@ function renderProgreso(){
  h+='</div><h2>Moto</h2><div class="card">';
  const motos=[...new Set([...Object.keys(S.moto),...dates.filter(d=>S.log[d].type==='MOTO')])].sort().reverse().slice(0,10);
  if(!motos.length)h+='<div class="mut">Sin salidas registradas.</div>';
- else h+=`<table><tr><th>Fecha</th><th>Horas</th><th>Arm pump</th><th>Espalda</th></tr>${motos.map(d=>{const m=motoAt(d)||{};return `<tr><td>${fmtD(d)}</td><td>${esc(m.horas)}</td><td>${esc(m.pump)}</td><td>${esc(m.espalda||'–')}</td></tr>${m.notas?`<tr><td colspan="4" class="note">${esc(m.notas)}</td></tr>`:''}`}).join('')}</table>`;
+ else h+=`<table><tr><th>Fecha</th><th>Horas</th><th>Arm pump</th><th>Lo más cargado</th></tr>${motos.map(d=>{const m=motoAt(d)||{},top=ZONAS.map(z=>z[0]).filter(k=>k!=='pump'&&z5(m,k)>=3).sort((a,b)=>z5(m,b)-z5(m,a));return `<tr><td>${fmtD(d)}</td><td>${esc(m.horas)}</td><td>${z5(m,'pump')?z5(m,'pump')+'/5':'–'}</td><td>${top.length?top.map(k=>ZN(k)+' '+z5(m,k)).join(' · '):ZONAS.some(([k])=>k!=='pump'&&z5(m,k))?'Todo bien':'–'}</td></tr>${m.notas?`<tr><td colspan="4" class="note">${esc(m.notas)}</td></tr>`:''}`}).join('')}</table>`;
  h+='</div><h2>Bici</h2><div class="card">';
  const bicis=Object.keys(S.bici).sort().reverse().slice(0,10);
  h+=bicis.length?`<table><tr><th>Fecha</th><th>Min</th><th>Tipo</th></tr>${bicis.map(d=>{const b=S.bici[d];return `<tr><td>${fmtD(d)}</td><td>${esc(b.min||'–')}</td><td>${{Z2:'Z2',SUB:'Fuerte',REC:'Suave'}[b.tipo]||''}</td></tr>`}).join('')}</table>`:'<div class="mut">Sin salidas registradas.</div>';
@@ -715,7 +735,7 @@ function renderAjustes(){
  <li>La bici Z2 se corre al primer día libre; si no entra, se estira la del domingo.</li>
  <li>Cada lunes: con 2 o 3 sesiones avanzás de semana del bloque; con menos, se repite.</li>
  <li>Cargas: "Sobró" sube, "Justo" sube en semanas 2 y 3, "No llegué" repite o baja.</li></ul></div>`;
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v6</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v7</div>`;
  return h}
 
 /* ============ Render ============ */
@@ -777,8 +797,7 @@ document.addEventListener('click',e=>{
  case 'pre':UI.pre[v]=!UI.pre[v];render();break;
  case 'motolog':motoSheet(todayStr());break;
  case 'mpick':el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===el));break;
- case 'motosave':{const p=document.querySelector('#mp .chip.on'),e2=document.querySelector('#me .chip.on'),old=S.moto[d]||{};replanDo(()=>{S.moto[d]={horas:$('#mh').value,pump:p?p.dataset.v:'',notas:$('#mn').value,espalda:e2?e2.dataset.v:(old.espalda||'')};if(S.log[d]&&S.log[d].type==='MOTO')delete S.log[d];delete S.unav[d]});break}
- case 'espalda':{const y=addDays(todayStr(),-1);if(S.moto[y])S.moto[y].espalda=v;save();render();toast('Anotado');break}
+ case 'motosave':{const old=S.moto[d]||{},n={horas:$('#mh').value,notas:$('#mn').value,esc:5};for(const [k] of ZONAS){const c=document.querySelector('#z-'+k+' .chip.on');n[k]=c?+c.dataset.v:(z5(old,k)||'')}replanDo(()=>{S.moto[d]=n;if(S.log[d]&&S.log[d].type==='MOTO')delete S.log[d];delete S.unav[d]});break}
  case 'setweek':S.block.week=+v;save();render();break;
  case 'retorno':S.retorno=!S.retorno;save();render();break;
  case 'setup':S.setup[v]=!S.setup[v];save();render();break;
