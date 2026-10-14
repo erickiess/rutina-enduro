@@ -286,7 +286,7 @@ const SES={
   {id:'c1',n:'Press banca',s:3,r:'6',rest:90,kg:1,inc:2.5,core:1,grp:'Bloque 1 · superserie con remo'},
   {id:'c2',grip:1,n:'Remo con mancuerna',s:3,r:'10 por lado',rest:90,kg:1,inc:2,core:1,grp:'Bloque 1 · superserie con press'},
   {id:'c3',grip:1,n:'Circuito "especial"',s:5,r:'rondas',rest:90,circuit:1,core:1,meas:'min',grp:'Bloque 2',note:'El agarre trabaja cansado y con pulsaciones altas: así es el arm pump real. Anotá el tiempo total (min).',items:[
-    {n:'Escaladores (mountain climbers) 40"',h:'mc'},{n:'Swing con pesa rusa x15',id:'c3sw',inc:4,h:'sw'},{n:'Farmer en el lugar 40" (marcha con las pesas)',id:'c3fc',inc:2,h:'fc'},{n:'Flexiones x12',h:'pu'},{n:'Sentadilla isométrica 30"',h:'iso'}]},
+    {n:'Escaladores 40" o soga 60"',h:'mc'},{n:'Swing con pesa rusa x15',id:'c3sw',inc:4,h:'sw'},{n:'Farmer en el lugar 40" (marcha con las pesas)',id:'c3fc',inc:2,h:'fc'},{n:'Flexiones x12',h:'pu'},{n:'Sentadilla isométrica 30"',h:'iso'}]},
   {id:'c6',n:'Equilibrio en una pierna',s:2,r:'30" por pierna',rest:30,grp:'Bloque 3 · equilibrio y core'},
   {id:'c7',n:'Aterrizajes a una pierna',s:2,r:'6 por pierna',rest:60,grp:'Bloque 3 · equilibrio y core'},
   {id:'c5',n:'Plancha lateral',s:3,r:'40" por lado',rest:45,secs:40,grp:'Bloque 3 · equilibrio y core'}]}
@@ -311,7 +311,7 @@ const HOW={
  c1:{img:['c1-0','c1-1'],m:'Pecho, hombros y tríceps',c:['Acostado en el banco, pies firmes en el piso, omóplatos juntos y apretados contra el banco.','Bajá la barra hasta rozar el pecho (a la altura del esternón), con los codos a unos 45° del cuerpo.','Empujá hasta estirar los brazos.','Si vas pesado, que alguien te asista.']},
  c2:{img:['c2-0','c2-1'],m:'Dorsales, espalda alta y bíceps',c:['Rodilla y mano del mismo lado apoyadas en el banco, espalda plana.','Tirá la mancuerna hacia la cadera, con el codo cerca del cuerpo.','Bajá hasta estirar el brazo del todo.']},
  c3:{img:[],m:'Todo el cuerpo, agarre y pulsaciones',c:['Hacé los 5 ejercicios de abajo seguidos, sin pausa entre ellos: eso es una ronda.','Pausa de 90 segundos entre rondas.']},
- mc:{img:['mc-0','mc-1'],m:'Pulsaciones, hombros y abdominales',c:['En posición de flexión, brazos estirados y cuerpo recto.','Llevá una rodilla al pecho y cambiá rápido de pierna, como corriendo en el lugar.','40 segundos a buen ritmo: es para subir las pulsaciones sin moverte de lugar.']},
+ mc:{img:['mc-0','mc-1'],m:'Pulsaciones (lo que hace la moto con el corazón)',c:['Elegí uno, los dos sirven igual. Se hacen ahí mismo, sin máquina.','Escaladores, 40 segundos: en posición de flexión, brazos estirados y cuerpo recto. Llevá una rodilla al pecho y cambiá rápido de pierna, como corriendo en el lugar.','Soga, 60 segundos: saltos cortos y seguidos, girando la soga con las muñecas, no con los brazos.']},
  bf:{img:['bf-0','bf-1'],m:'Pulsaciones',c:['60 segundos a fondo, con resistencia alta.']},
  sw:{img:['sw-0','sw-1'],m:'Glúteos, isquios, agarre y pulsaciones',f:'La foto es con una mano: hacelo con las dos.',c:['Pesa rusa entre las piernas; la cadera va atrás, como en el rumano.','Empujá la cadera fuerte hacia adelante: la pesa sube sola hasta la altura del pecho.','Los brazos solo guían; la fuerza sale de la cadera.']},
  fc:{img:['a5-0','a5-1'],m:'Agarre, trapecios y zona media',f:'En la foto camina: acá es en el lugar, al lado de tus cosas.',c:['Una mancuerna o pesa rusa en cada mano, con un peso que puedas sostener sin apretar al máximo (el Gym C cae cerca de la moto).','Parado derecho, hombros atrás, marchá en el lugar levantando las rodillas, 40 segundos.','Sin balancear las pesas ni inclinarte.']},
@@ -747,7 +747,7 @@ function renderAjustes(){
  <li>La bici Z2 se corre al primer día libre; si no entra, se estira la del domingo.</li>
  <li>Cada lunes: con 2 o 3 sesiones avanzás de semana del bloque; con menos, se repite.</li>
  <li>Cargas: "Sobró" sube, "Justo" sube en semanas 2 y 3, "No llegué" repite o baja.</li></ul></div>`;
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v12</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v13</div>`;
  return h}
 
 /* ============ Render ============ */
