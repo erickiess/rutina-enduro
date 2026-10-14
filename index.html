@@ -271,7 +271,8 @@ const SES={
   {id:'a7',n:'Nordic de isquiotibiales',s:2,r:'4-5',rest:90,note:'Bajá lo más lento posible. La primera semana, 1 serie de 3.'},
   {id:'a4',grip:1,n:'Isométrico "parado en pedalines"',s:3,r:'45-60"',rest:90,kg:1,inc:2,secs:50,core:1,note:'Posición de ataque agarrando una barra al frente, como el manubrio. kg = barra + discos. Específico moto.'},
   {id:'a5',grip:1,n:'Suitcase carry pesado',s:3,r:'30 m por lado',rest:60,kg:1,inc:2,note:'Lumbar y oblicuos'},
-  {id:'a6',n:'Pallof press en polea',s:3,r:'10 por lado',rest:45,kg:1,inc:2.5}]},
+  {id:'a6',n:'Pallof press en polea',s:3,r:'10 por lado',rest:45,kg:1,inc:2.5},
+  {id:'a8',n:'Extensión lumbar quieta',s:3,r:'30-45"',rest:45,secs:40,note:'Aguante de la espalda baja: lo que pide ir parado en la moto.'}]},
  B:{name:'Gym B',title:'Espalda alta, hombros, agarre',min:70,warm:"Remo o bici 5', band pull-aparts 2x15, rotaciones de hombro.",ex:[
   {id:'b1',grip:1,n:'Dominadas lastradas',s:4,r:'5-6',rest:150,kg:1,inc:2.5,core:1,note:'kg = lastre'},
   {id:'b2',n:'Remo con pecho apoyado',s:4,r:'10',rest:90,kg:1,inc:2.5,core:1,note:'Apretar escápulas 1" arriba'},
@@ -289,6 +290,7 @@ const SES={
     {n:'Escaladores 40" o soga 60"',h:'mc'},{n:'Swing con pesa rusa x15',id:'c3sw',inc:4,h:'sw'},{n:'Farmer en el lugar 40" (marcha con las pesas)',id:'c3fc',inc:2,h:'fc'},{n:'Flexiones x12',h:'pu'},{n:'Sentadilla isométrica 30"',h:'iso'}]},
   {id:'c6',n:'Equilibrio en una pierna',s:2,r:'30" por pierna',rest:30,grp:'Bloque 3 · equilibrio y core'},
   {id:'c7',n:'Aterrizajes a una pierna',s:2,r:'6 por pierna',rest:60,grp:'Bloque 3 · equilibrio y core'},
+  {id:'c8',n:'Bird-dog',s:2,r:'6 por lado',rest:30,grp:'Bloque 3 · equilibrio y core'},
   {id:'c5',n:'Plancha lateral',s:3,r:'40" por lado',rest:45,secs:40,grp:'Bloque 3 · equilibrio y core'}]}
 };
 // Cómo se hace cada ejercicio. Fotos: free-exercise-db (dominio público), en img/ex/. f = aclaración cuando la foto no es exacta.
@@ -321,6 +323,8 @@ const HOW={
  b10:{img:['nk-0','nk-1'],m:'Cuello',c:['Sentado o parado derecho, apoyá la mano en la frente.','Empujá con la cabeza contra la mano al 50-60 % de tu fuerza, sin que la cabeza se mueva, 10 segundos.','Repetí con la mano atrás de la cabeza y a cada costado: 4 direcciones.']},
  c6:{img:[],m:'Tobillos y rodillas: equilibrio',c:['Parado en una pierna sobre una colchoneta o almohadón, rodilla apenas flexionada.','Aguantá 30 segundos sin apoyar el otro pie. Cambiá de pierna.','Cuando sea fácil, hacelo con los ojos cerrados o moviendo los brazos.']},
  c7:{img:[],m:'Rodillas y tobillos: aterrizar bien',c:['Subite a un cajón o escalón bajo (20-30 cm).','Bajá dando un paso y caé en UNA pierna, frenando el aterrizaje en 2 segundos.','La rodilla apunta al pie, sin irse para adentro. Cadera atrás, como en media sentadilla.','6 por pierna. Arrancá bajito y subí la altura de a poco.']},
+ a8:{img:['hx-0'],m:'Espalda baja (aguante) y glúteos',c:['En el banco de 45° (hiperextensiones), con el borde del apoyo a la altura de la cadera y los tobillos trabados.','Cuerpo recto de los talones a la cabeza, como en la foto, brazos cruzados en el pecho.','Quedate quieto 30 a 45 segundos, apretando glúteos. Sin arquear para atrás.','Si no hay banco: boca abajo en el piso, levantá apenas el pecho y las piernas (superman) y aguantá.']},
+ c8:{img:[],m:'Espalda baja y zona media (estabilidad)',c:['En cuatro patas, manos debajo de los hombros y rodillas debajo de la cadera, espalda plana.','Estirá un brazo adelante y la pierna contraria atrás, hasta quedar en línea con el cuerpo.','Aguantá 8 segundos sin que la cadera se ladee ni la espalda se arquee. Volvé y cambiá de lado.']},
  c4:{img:['c4-0','c4-1'],m:'Abdominales',c:['De rodillas, con la rueda en el piso debajo de los hombros.','Rodá hacia adelante estirando el cuerpo hasta donde puedas sin que se hunda la espalda baja.','Volvé tirando con el abdomen.']},
  c5:{img:['c5-0','c5-1'],m:'Oblicuos y cadera',c:['De costado, apoyado en el antebrazo (codo debajo del hombro) y en el costado de los pies.','Levantá la cadera hasta que el cuerpo quede recto.','Aguantá 40 segundos y cambiá de lado.']}
 };
@@ -337,7 +341,7 @@ const ACT={
  Z2:{name:'Bici Z2',title:'Bici afuera, 75 a 120 min',li:['Ritmo en el que podés hablar en frases completas.','La base aeróbica es lo que más baja el arm pump.','Si hay MTB, mejor que la de ruta: suma agarre y trabajo parado.']},
  SUB:{name:'Bici con subidas',title:"Z2 con 4 x 3' fuertes en subida",li:["Salida de 75 a 120 min, casi toda en Z2.","En el medio, 4 subidas de 3' fuertes (podés hablar solo con palabras sueltas) con 3' suaves entre cada una.","La moto lleva el corazón al 90 % o más: esto lo entrena. En semana de descarga, solo Z2."]},
  REST:{name:'Descanso',title:'O 30 min de bici suave + movilidad',li:['Nada pesado: mañana hay moto.','Movilidad de cadera, hombros y muñecas.']},
- REC:{name:'Recuperación',title:'Bici suave 45-60 min (Z1-Z2) + movilidad torácica',li:['Nada de exigirse. Si es en bici, que sea plana: nada de MTB técnico, el antebrazo todavía está cansado.','Movilidad (8 min): libro abierto 2x8 por lado y 90/90 de cadera 2x6 por lado.','Post-moto: movilidad torácica y face pull liviano 2x20.']},
+ REC:{name:'Recuperación',title:'Bici suave 45-60 min (Z1-Z2) + movilidad torácica',li:['Nada de exigirse. Si es en bici, que sea plana: nada de MTB técnico, el antebrazo todavía está cansado.','Movilidad (10 min): libro abierto 2x8 por lado, 90/90 de cadera 2x6 por lado y estiramiento de flexores de cadera 2x30" por lado (una rodilla en el piso, empujá la cadera adelante sin arquear la espalda).','Post-moto: movilidad torácica y face pull liviano 2x20.']},
  MOTO:{name:'MOTO',title:'Sábado de enduro',li:[]},
  BICI:{name:'Bici',title:'Salida planeada',li:['Si es larga, que sea Z2: podés hablar en frases completas.','Si hay MTB, mejor: suma agarre y trabajo parado.']},
  LIBRE:{name:'Libre',title:'Descanso, o bici suave si tenés ganas',li:['No hace falta recuperar nada hoy.']}
@@ -747,7 +751,7 @@ function renderAjustes(){
  <li>La bici Z2 se corre al primer día libre; si no entra, se estira la del domingo.</li>
  <li>Cada lunes: con 2 o 3 sesiones avanzás de semana del bloque; con menos, se repite.</li>
  <li>Cargas: "Sobró" sube, "Justo" sube en semanas 2 y 3, "No llegué" repite o baja.</li></ul></div>`;
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v13</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v14</div>`;
  return h}
 
 /* ============ Render ============ */
