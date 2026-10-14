@@ -291,7 +291,7 @@ const SES={
   {id:'c6',n:'Equilibrio en una pierna',s:2,r:'30" por pierna',rest:30,grp:'Bloque 3 · equilibrio y core'},
   {id:'c7',n:'Aterrizajes a una pierna',s:2,r:'6 por pierna',rest:60,grp:'Bloque 3 · equilibrio y core'},
   {id:'c8',n:'Bird-dog',s:2,r:'6 por lado',rest:30,grp:'Bloque 3 · equilibrio y core'},
-  {id:'c5',n:'Plancha lateral',s:3,r:'40" por lado',rest:45,secs:40,grp:'Bloque 3 · equilibrio y core'}]}
+  {id:'c9',n:'Plancha Copenhagen',s:3,r:'20-30" por lado',rest:45,secs:25,grp:'Bloque 3 · equilibrio y core',note:'Aductores: los que aprietan la moto con las rodillas. La primera semana, 1 serie y con la rodilla en el banco.'}]}
 };
 // Cómo se hace cada ejercicio. Fotos: free-exercise-db (dominio público), en img/ex/. f = aclaración cuando la foto no es exacta.
 const HOW={
@@ -326,7 +326,8 @@ const HOW={
  a8:{img:['hx-0'],m:'Espalda baja (aguante) y glúteos',c:['En el banco de 45° (hiperextensiones), con el borde del apoyo a la altura de la cadera y los tobillos trabados.','Cuerpo recto de los talones a la cabeza, como en la foto, brazos cruzados en el pecho.','Quedate quieto 30 a 45 segundos, apretando glúteos. Sin arquear para atrás.','Si no hay banco: boca abajo en el piso, levantá apenas el pecho y las piernas (superman) y aguantá.']},
  c8:{img:[],m:'Espalda baja y zona media (estabilidad)',c:['En cuatro patas, manos debajo de los hombros y rodillas debajo de la cadera, espalda plana.','Estirá un brazo adelante y la pierna contraria atrás, hasta quedar en línea con el cuerpo.','Aguantá 8 segundos sin que la cadera se ladee ni la espalda se arquee. Volvé y cambiá de lado.']},
  c4:{img:['c4-0','c4-1'],m:'Abdominales',c:['De rodillas, con la rueda en el piso debajo de los hombros.','Rodá hacia adelante estirando el cuerpo hasta donde puedas sin que se hunda la espalda baja.','Volvé tirando con el abdomen.']},
- c5:{img:['c5-0','c5-1'],m:'Oblicuos y cadera',c:['De costado, apoyado en el antebrazo (codo debajo del hombro) y en el costado de los pies.','Levantá la cadera hasta que el cuerpo quede recto.','Aguantá 40 segundos y cambiá de lado.']}
+ c5:{img:['c5-0','c5-1'],m:'Oblicuos y cadera',c:['De costado, apoyado en el antebrazo (codo debajo del hombro) y en el costado de los pies.','Levantá la cadera hasta que el cuerpo quede recto.','Aguantá 40 segundos y cambiá de lado.']},
+ c9:{img:['c5-0','c5-1'],m:'Aductores (apretar la moto con las rodillas), oblicuos y cadera',f:'En la foto los pies están en el piso: acá la pierna de arriba va apoyada en un banco.',c:['De costado, apoyado en el antebrazo (codo debajo del hombro). La pierna de arriba sobre un banco a la altura de la cadera; la de abajo, colgando debajo del banco.','Para arrancar, apoyá en el banco la rodilla (es más fácil). Cuando salga bien, el tobillo.','Levantá la cadera empujando el banco con la pierna de arriba, hasta que el cuerpo quede recto. Aguantá 20 a 30 segundos y cambiá de lado.','Si duele la ingle (dolor, no esfuerzo), volvé a la versión con la rodilla.']}
 };
 const EXIMG=f=>`img/ex/${f}.jpg`;
 function thumb(id){const h=HOW[id],f=h&&h.img[0];return `<span class="th ${f?'':'noimg'}" data-act="how" data-id="${id}">${f?`<img src="${EXIMG(f)}" alt="" loading="lazy">`:ic('info')}</span>`}
@@ -341,7 +342,7 @@ const ACT={
  Z2:{name:'Bici Z2',title:'Bici afuera, 75 a 120 min',li:['Ritmo en el que podés hablar en frases completas.','La base aeróbica es lo que más baja el arm pump.','Si hay MTB, mejor que la de ruta: suma agarre y trabajo parado.']},
  SUB:{name:'Bici con subidas',title:"Z2 con 4 x 3' fuertes en subida",li:["Salida de 75 a 120 min, casi toda en Z2.","En el medio, 4 subidas de 3' fuertes (podés hablar solo con palabras sueltas) con 3' suaves entre cada una.","La moto lleva el corazón al 90 % o más: esto lo entrena. En semana de descarga, solo Z2."]},
  REST:{name:'Descanso',title:'O 30 min de bici suave + movilidad',li:['Nada pesado: mañana hay moto.','Movilidad de cadera, hombros y muñecas.']},
- REC:{name:'Recuperación',title:'Bici suave 45-60 min (Z1-Z2) + movilidad torácica',li:['Nada de exigirse. Si es en bici, que sea plana: nada de MTB técnico, el antebrazo todavía está cansado.','Movilidad (10 min): libro abierto 2x8 por lado, 90/90 de cadera 2x6 por lado y estiramiento de flexores de cadera 2x30" por lado (una rodilla en el piso, empujá la cadera adelante sin arquear la espalda).','Post-moto: movilidad torácica y face pull liviano 2x20.']},
+ REC:{name:'Recuperación',title:'Bici suave 45-60 min (Z1-Z2) + movilidad torácica',li:['Nada de exigirse. Si es en bici, que sea plana: nada de MTB técnico, el antebrazo todavía está cansado.','Movilidad (10 min): libro abierto 2x8 por lado, 90/90 de cadera 2x6 por lado y estiramiento de flexores de cadera 2x30" por lado (una rodilla en el piso, empujá la cadera adelante sin arquear la espalda).','Post-moto: movilidad torácica y face pull liviano 2x20.','Si quedaron cargados los antebrazos: una pelota de tenis contra la mesa, 1-2 min por antebrazo moviendo la muñeca, y estiramiento de flexores 2x20". Alivia la sensación; no hace falta más.']},
  MOTO:{name:'MOTO',title:'Sábado de enduro',li:[]},
  BICI:{name:'Bici',title:'Salida planeada',li:['Si es larga, que sea Z2: podés hablar en frases completas.','Si hay MTB, mejor: suma agarre y trabajo parado.']},
  LIBRE:{name:'Libre',title:'Descanso, o bici suave si tenés ganas',li:['No hace falta recuperar nada hoy.']}
@@ -351,8 +352,8 @@ const DEFIDX={A:0,B:2,C:3};
 const DROP={A:10,C:9.5,B:9};
 const DROPTIP={A:'En la próxima sesión sumá al principio 3x5 de sentadilla a RPE 7 para no perder la semana de piernas.',B:'En la próxima sesión sumá al final 2 dead hang y 2x15 face pull para no perder el agarre y los hombros.',C:'Sumá 2 vueltas del circuito al final de la próxima sesión, o bici con 5 piques de 1 min fuerte.'};
 const BLOCK={1:'Cargas base (RPE 7-8)',2:'+2,5 a 5 kg o +1 rep',3:'+2,5 a 5 kg o +1 rep (RPE 8-9)',4:'Descarga: -40% de volumen, misma técnica'};
-const PRE_MOTO=['Abrir y cerrar manos, extensores con banda, rotaciones de muñeca','Círculos de hombro, band pull-aparts','10 sentadillas y 10 bisagras de cadera'];
-const SETUP=['Altura del manubrio y risers (si duele la espalda alta, suele ser manubrio bajo o adelantado)','Ángulo de manetas: parado, la muñeca recta','Recorrido del embrague: sin estirar los dedos de más','Puños: ni muy gruesos ni muy finos'];
+const PRE_MOTO=['3-5 min de soga, trote o saltos hasta empezar a transpirar','Abrir y cerrar manos, extensores con banda, rotaciones de muñeca','Círculos de hombro, band pull-aparts','10 sentadillas y 10 bisagras de cadera'];
+const SETUP=['Altura del manubrio y risers (si duele la espalda alta, suele ser manubrio bajo o adelantado)','Ángulo de manetas: parado, la muñeca recta','Recorrido del embrague: sin estirar los dedos de más','Puños: ni muy gruesos ni muy finos','Embrague liviano: cable lubricado o hidráulico bien purgado (cada tirón suma)','Suspensión de adelante: si está dura y golpea, te obliga a apretar (probá 1-2 clicks más blanda en compresión)'];
 const EXNAME={};
 for(const k of GYM)for(const e of SES[k].ex){EXNAME[e.id]=e.n;if(e.items)for(const it of e.items)if(it.id)EXNAME[it.id]=it.n.replace(/ x\d+| \d+ m/,'')}
 
@@ -542,7 +543,7 @@ function renderHoy(){
  if(S.weekMsg)h+=`<div class="ban"><button data-act="dismiss">✕</button>${esc(S.weekMsg)}</div>`;
  if(S.draft&&S.draft.date!==t)h+=`<div class="ban warn">Quedó sin terminar ${SES[S.draft.type].name} del ${fmtD(S.draft.date)}.<div class="row"><button class="btn sm" data-act="resume">Abrir y terminar</button><button class="btn sm ghost" data-act="discard">Descartar</button></div></div>`;
  const lm=lastMoto();
- if(lm&&z5(lm.m,'pump')>=4)h+=`<div class="ban warn">Arm pump ${z5(lm.m,'pump')}/5 (${NIV[z5(lm.m,'pump')-1].toLowerCase()}) el ${fmtD(lm.d)}. Esta semana no saltees la bici Z2 (es lo que más lo baja) y salí suave los primeros 15'.</div>`;
+ if(lm&&z5(lm.m,'pump')>=4)h+=`<div class="ban warn">Arm pump ${z5(lm.m,'pump')}/5 (${NIV[z5(lm.m,'pump')-1].toLowerCase()}) el ${fmtD(lm.d)}. Esta semana no saltees la bici Z2 (es lo que más lo baja) y salí suave los primeros 15'. Revisá manetas, embrague y suspensión (Ajustes → checklist). <b>Al médico</b> si tarda más de 15 min en irse al parar, viene con hormigueo o dedos dormidos, o te hace soltar el manubrio.</div>`;
  if(lm&&z5(lm.m,'espalda')>=4)h+=`<div class="ban warn">Espalda ${z5(lm.m,'espalda')}/5 después de la moto. Revisá el setup (Ajustes → checklist) y sumá face pull + movilidad torácica.</div>`;
  if(P.dropped.length)h+=`<div class="ban bad">Esta semana no entra ${P.dropped.map(g=>SES[g].name).join(' ni ')} sin pisar la moto. No la fuerces: el lunes arranca de nuevo.<ul class="l">${P.dropped.map(g=>'<li>'+DROPTIP[g]+'</li>').join('')}</ul></div>`;
  if(lm&&lm.d>=addDays(t,-2)){const hi=ZONAS.map(z=>z[0]).filter(k=>k!=='pump'&&k!=='espalda'&&z5(lm.m,k)>=4);
@@ -578,7 +579,7 @@ function heroCard(p,P){
  }else if(k==='MOTO'){
   h+=hd(k,'Toca hoy','Moto','Antes de salir (10\')');
   h+=PRE_MOTO.map((x,i)=>`<div class="chk ${UI.pre[i]?'on':''}" data-act="pre" data-v="${i}"><i>${UI.pre[i]?'✓':''}</i><span>${x}</span></div>`).join('');
-  h+=`<div class="k" style="margin-top:10px">En la moto</div><ul class="tips"><li>Primeros 15 min suave: el arm pump empeora mucho si salís en frío.</li><li>Agarre suelto: apretá con las rodillas, no con las manos.</li><li>Hidratación constante.</li></ul><button class="btn" data-act="motolog">Registrar la salida</button>`;
+  h+=`<div class="k" style="margin-top:10px">En la moto</div><ul class="tips"><li>Primeros 15 min suave: el arm pump empeora mucho si salís en frío.</li><li>Agarre suelto: apretá la moto con las rodillas y las botas, no con las manos.</li><li>Respirá: soltá el aire en cada recta y antes de cada obstáculo. Si estás aguantando el aire, estás apretando el manubrio.</li><li>Si se cargan los antebrazos, en una parada: brazo arriba, cerrá fuerte y abrí la mano 10 veces, y estirá los dedos hacia atrás 15-20".</li><li>Tomá agua desde la noche anterior y durante. Con calor, una pizca de sal o electrolitos en la mochila.</li></ul><button class="btn" data-act="motolog">Registrar la salida</button>`;
  }else{
   const a=ACT[k];
   h+=hd(k,p.moved?'Movida a hoy':p.swapped?'Cambiada por cómo te sentías':'Toca hoy',a.name,a.title);
@@ -751,7 +752,7 @@ function renderAjustes(){
  <li>La bici Z2 se corre al primer día libre; si no entra, se estira la del domingo.</li>
  <li>Cada lunes: con 2 o 3 sesiones avanzás de semana del bloque; con menos, se repite.</li>
  <li>Cargas: "Sobró" sube, "Justo" sube en semanas 2 y 3, "No llegué" repite o baja.</li></ul></div>`;
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v14</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v15</div>`;
  return h}
 
 /* ============ Render ============ */
