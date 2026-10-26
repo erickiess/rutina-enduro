@@ -721,6 +721,8 @@ function renderSemana(){
  let h=`<header class="top"><div class="eyebrow">Gym esta semana: ${gymCount(mon)} de 3</div><h1 class="ttl">Semana</h1>${blockBar()}</header>`;
  h+=`<div class="note">Marcá los días que pensás andar (podés marcar varios). Antes y después de una moto no pone gym, y 2 días antes no pone piernas pesadas. Una bici planeada reemplaza al Z2 del martes.</div>`;
  h+=weekBlock(mon,'Esta semana · '+f(mon))+weekBlock(nm,'Próxima semana · '+f(nm));
+ const pm=addDays(mon,-7);h+=`<h2>Semana pasada · ${f(pm)}</h2><div class="card" style="padding:0">${[0,1,2,3,4,5,6].map(i=>{const d=addDays(pm,i),L=S.log[d],x=[L&&L.type!=='MOTO'?kindName(L.type):'',motoAt(d)?'Moto 🏍':'',S.bici[d]&&!(L&&L.type==='OTRO')?'Bici 🚴':''].filter(Boolean).join(' + ');
+  return `<div class="day past" data-act="dayopt" data-d="${d}"><div class="d">${DIAS[i]}<small>${pd(d).getDate()}/${pd(d).getMonth()+1}</small></div><div class="what">${x||'<span class="mut">Sin anotar · tocá para cargar</span>'}</div></div>`}).join('')}</div>`;
  return h+'<div class="note">Tocá un día para marcar que no podés, planear o registrar algo que hiciste.</div>'}
 function dayOptions(d){
  const t=todayStr(),L=S.log[d];
@@ -784,7 +786,7 @@ function renderAjustes(){
  <div class="q"><div class="k">Token</div><input id="ght" type="password" autocomplete="off" placeholder="${c.token?'guardado (pegá otro para cambiarlo)':'github_pat_...'}"></div>
  <button class="btn" data-act="ghsave">Guardar y enviar</button>${c.token?`<button class="btn ghost" data-act="ghsync">Enviar ahora</button><button class="btn link" data-act="ghoff">Desconectar</button>`:''}
  <div class="mut" style="margin-top:6px">${c.err?'⚠️ Último error: '+esc(c.err):c.last?'Último envío: '+new Date(c.last).toLocaleString('es-AR'):'Todavía no se envió nada.'}</div></div>`}
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v16</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v17</div>`;
  return h}
 
 /* ============ Render ============ */
