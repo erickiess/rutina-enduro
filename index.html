@@ -345,6 +345,7 @@ const ACT={
  REC:{name:'Recuperación',title:'Bici suave 45-60 min (Z1-Z2) + movilidad torácica',li:['Nada de exigirse. Si es en bici, que sea plana: nada de MTB técnico, el antebrazo todavía está cansado.','Movilidad (10 min): libro abierto 2x8 por lado, 90/90 de cadera 2x6 por lado y estiramiento de flexores de cadera 2x30" por lado (una rodilla en el piso, empujá la cadera adelante sin arquear la espalda).','Post-moto: movilidad torácica y face pull liviano 2x20.','Si quedaron cargados los antebrazos: una pelota de tenis contra la mesa, 1-2 min por antebrazo moviendo la muñeca, y estiramiento de flexores 2x20". Alivia la sensación; no hace falta más.']},
  MOTO:{name:'MOTO',title:'Sábado de enduro',li:[]},
  BICI:{name:'Bici',title:'Salida planeada',li:['Si es larga, que sea Z2: podés hablar en frases completas.','Si hay MTB, mejor: suma agarre y trabajo parado.']},
+ OTRO:{name:'Otra cosa',title:'Cambié lo planeado',li:[]},
  LIBRE:{name:'Libre',title:'Descanso, o bici suave si tenés ganas',li:['No hace falta recuperar nada hoy.']}
 };
 const GYM=['A','B','C'];
@@ -362,7 +363,25 @@ const KEY='enduroGym.v1';
 let S=load();
 function blank(){return{v:1,block:{week:1,cycle:1},retorno:false,zeroRun:0,lastWeek:null,log:{},weights:{},unav:{},swap:{},noMoto:{},moto:{},motoDay:{},bici:{},plan:{},motoWeek:{},draft:null,weekMsg:null,setup:{}}}
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1)return Object.assign(blank(),s)}catch(e){}return blank()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncSoon()}
+// ---------- Sync a GitHub ----------
+// Sube el historial a un repo privado (historial.json) para que Claude lo lea. Token y repo quedan solo en este celular, fuera de S.
+const GHK='enduroGym.gh';
+function ghCfg(){try{return JSON.parse(localStorage.getItem(GHK))||{}}catch(e){return{}}}
+function ghSet(c){try{localStorage.setItem(GHK,JSON.stringify(c))}catch(e){}}
+let syncT=null;
+function syncSoon(){const c=ghCfg();if(!c.token||!c.repo)return;clearTimeout(syncT);syncT=setTimeout(syncNow,4000)}
+async function syncNow(manual){
+ const c=ghCfg();if(!c.token||!c.repo)return;clearTimeout(syncT);
+ const url='https://api.github.com/repos/'+c.repo+'/contents/historial.json',hd={Authorization:'Bearer '+c.token,Accept:'application/vnd.github+json'};
+ try{
+  const g=await fetch(url,{headers:hd,cache:'no-store'});const sha=g.ok?(await g.json()).sha:undefined;
+  if(!g.ok&&g.status!==404)throw new Error('GitHub '+g.status);
+  const body=JSON.stringify({message:'historial '+todayStr(),content:btoa(unescape(encodeURIComponent(JSON.stringify(Object.assign({},S,{draft:null,subido:new Date().toISOString()}),null,1)))),sha});
+  const r=await fetch(url,{method:'PUT',headers:hd,body});if(!r.ok)throw new Error('GitHub '+r.status);
+  c.last=new Date().toISOString();c.err=null;ghSet(c);if(manual)toast('Enviado a Claude ✓');
+ }catch(e){c.err=String(e.message||e);ghSet(c);if(manual)toast('No se pudo enviar: '+c.err)}
+ if(view==='ajustes'&&!$('#sheet').innerHTML)render()}
 let view='hoy',CI=null,UI={pre:{}};
 
 function gymCount(mon){let n=0;for(let i=0;i<7;i++){const L=S.log[addDays(mon,i)];if(L&&L.status==='done'&&GYM.includes(L.type))n++}return n}
@@ -586,8 +605,16 @@ function heroCard(p,P){
   h+=`<ul class="tips">${a.li.map(x=>`<li>${x}</li>`).join('')}${p.note?`<li><b>${p.note}</b></li>`:''}</ul>`;
   h+=`<div class="row"><label class="kg"><input type="number" id="actmin" inputmode="numeric" placeholder="min"> minutos</label></div><button class="btn okb" data-act="actdone" data-v="${k}">${ic('check')} Hecho</button>`;
  }
- h+=`<button class="btn link" data-act="nopuedo" data-d="${t}">Hoy no puedo</button>`;
+ h+=`<button class="btn ghost" data-act="otro" data-d="${t}">Hice otra cosa (bici, elongar…)</button><button class="btn link" data-act="nopuedo" data-d="${t}">Hoy no puedo</button>`;
  return h+'</div>'+otherSessions(P)}
+function otroSheet(d){const L=S.log[d]&&S.log[d].type==='OTRO'?S.log[d]:{},b=S.bici[d]||{};
+ const ch=(id,opts,v)=>`<div class="chips" id="${id}">${opts.map(([k,l])=>`<button class="chip ${v==k?'on':''}" data-act="mpick" data-v="${k}">${l}</button>`).join('')}</div>`;
+ sheet(`<h1>Otra cosa · ${fmtD(d)}</h1><div class="mut">En vez de lo planeado. La sesión de gym se mueve a otro día si entra.</div>
+ <div class="q"><div class="k">Bici (min)</div><input type="number" id="om" inputmode="numeric" placeholder="0 si no hubo" value="${esc(b.min||'')}">${ch('ot',[['REC','Suave'],['Z2','Z2'],['SUB','Fuerte']],b.tipo||'REC')}</div>
+ <div class="q"><div class="k">Elongación / movilidad (min)</div><input type="number" id="os" inputmode="numeric" placeholder="ej. 20" value="${esc(L.stretch||'')}"></div>
+ <div class="q"><div class="k">¿Cómo estabas? (1 = fresco, 5 = destruido)</div>${ch('oc',[1,2,3,4,5].map(n=>[n,n]),L.cans||'')}</div>
+ <div class="q"><div class="k">¿Por qué? / notas</div><textarea id="on" placeholder="dormí mal, mucho laburo, dolor de...">${esc(L.nota||'')}</textarea></div>
+ <button class="btn" data-act="otrosave" data-d="${d}">Guardar</button><button class="btn ghost" data-act="closesheet">Cancelar</button>`)}
 function otherSessions(P){
  const t=todayStr(),mon=mondayOf(t),pend=GYM.filter(g=>!P.days.some(p=>p.kind===g&&(p.done||p.inprog)));
  const todayK=P.days[dow(t)].kind,opts=pend.filter(g=>g!==todayK);
@@ -706,7 +733,7 @@ function dayOptions(d){
  else{
   if(d>=t){h+=S.unav[d]?`<button class="btn" data-act="canday" data-d="${d}">Ese día sí puedo</button>`:`<button class="btn" data-act="nopuedo" data-d="${d}">Ese día no puedo ir</button>`;
    if(S.swap[d])h+=`<button class="btn ghost" data-act="unswap" data-d="${d}">Volver a lo planificado</button>`}
-  if(d<=t){h+=`<h2>Registrar lo que hice</h2><div class="row">${['A','B','C'].map(k=>`<button class="btn sm ghost" data-act="quicklog" data-d="${d}" data-v="${k}">${SES[k].name}</button>`).join('')}<button class="btn sm ghost" data-act="motoask" data-d="${d}">🏍 Moto</button><button class="btn sm ghost" data-act="biciask" data-d="${d}">🚴 Bici</button><button class="btn sm ghost" data-act="quicklog" data-d="${d}" data-v="REST">Descanso</button></div><div class="note">Registro rápido del gym, sin cargas. Sirve para que la semana se reacomode bien.</div>`}
+  if(d<=t){h+=`<h2>Registrar lo que hice</h2><div class="row">${['A','B','C'].map(k=>`<button class="btn sm ghost" data-act="quicklog" data-d="${d}" data-v="${k}">${SES[k].name}</button>`).join('')}<button class="btn sm ghost" data-act="motoask" data-d="${d}">🏍 Moto</button><button class="btn sm ghost" data-act="biciask" data-d="${d}">🚴 Bici</button><button class="btn sm ghost" data-act="otro" data-d="${d}">Otra cosa</button><button class="btn sm ghost" data-act="quicklog" data-d="${d}" data-v="REST">Descanso</button></div><div class="note">Registro rápido del gym, sin cargas. Sirve para que la semana se reacomode bien.</div>`}
  }
  h+=`<button class="btn ghost" data-act="closesheet">Cerrar</button>`;sheet(h)}
 
@@ -752,7 +779,12 @@ function renderAjustes(){
  <li>La bici Z2 se corre al primer día libre; si no entra, se estira la del domingo.</li>
  <li>Cada lunes: con 2 o 3 sesiones avanzás de semana del bloque; con menos, se repite.</li>
  <li>Cargas: "Sobró" sube, "Justo" sube en semanas 2 y 3, "No llegué" repite o baja.</li></ul></div>`;
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v15</div>`;
+ {const c=ghCfg();h+=`<h2>Enviar a Claude</h2><div class="card"><div class="note" style="margin-bottom:8px">Sube tu historial a un repo privado de GitHub cada vez que anotás algo, para que Claude lo lea y ajuste la rutina.</div>
+ <div class="q"><div class="k">Repo</div><input id="ghr" placeholder="erickiess/rutina-enduro-datos" value="${esc(c.repo||'erickiess/rutina-enduro-datos')}"></div>
+ <div class="q"><div class="k">Token</div><input id="ght" type="password" autocomplete="off" placeholder="${c.token?'guardado (pegá otro para cambiarlo)':'github_pat_...'}"></div>
+ <button class="btn" data-act="ghsave">Guardar y enviar</button>${c.token?`<button class="btn ghost" data-act="ghsync">Enviar ahora</button><button class="btn link" data-act="ghoff">Desconectar</button>`:''}
+ <div class="mut" style="margin-top:6px">${c.err?'⚠️ Último error: '+esc(c.err):c.last?'Último envío: '+new Date(c.last).toLocaleString('es-AR'):'Todavía no se envió nada.'}</div></div>`}
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v16</div>`;
  return h}
 
 /* ============ Render ============ */
@@ -807,6 +839,13 @@ document.addEventListener('click',e=>{
  case 'nomoto':replanDo(()=>{for(let i=0;i<7;i++){const x=addDays(d,i);if(S.plan[x]==='MOTO')delete S.plan[x]}S.motoWeek[d]=true});break;
  case 'biciask':biciSheet(d);break;
  case 'bicisave':{const tp=document.querySelector('#bt .chip.on');replanDo(()=>{S.bici[d]={min:$('#bm').value,tipo:tp?tp.dataset.v:'Z2',notas:$('#bn').value};if(S.plan[d]==='BICI')delete S.plan[d];delete S.unav[d]});break}
+ case 'otro':otroSheet(d);break;
+ case 'otrosave':{const pk=id=>{const c=document.querySelector('#'+id+' .chip.on');return c?c.dataset.v:null},bm=+$('#om').value||0;
+  replanDo(()=>{S.log[d]={type:'OTRO',status:'done',stretch:+$('#os').value||null,cans:+pk('oc')||null,nota:$('#on').value,bici:bm||null};
+   if(bm)S.bici[d]={min:bm,tipo:pk('ot')||'REC',notas:''};else delete S.bici[d];delete S.unav[d];delete S.swap[d]});break}
+ case 'ghsave':{const c=ghCfg();c.repo=$('#ghr').value.trim();const tk=$('#ght').value.trim();if(tk)c.token=tk;ghSet(c);syncNow(true);break}
+ case 'ghsync':syncNow(true);break;
+ case 'ghoff':if(confirm('¿Dejar de enviar a Claude? Se borra el token de este celular.')){ghSet({});render()}break;
  case 'bicidel':if(confirm('¿Borrar la bici del '+fmtD(d)+'?'))replanDo(()=>{delete S.bici[d]});break;
  case 'motoday':{const mon=mondayOf(todayStr());replanDo(()=>{S.motoDay[mon]=+v;delete S.noMoto[mon]});break}
  case 'motoask':motoSheet(d);break;
