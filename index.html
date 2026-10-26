@@ -238,6 +238,34 @@ ol.how li::before{content:counter(s);position:absolute;left:0;top:9px;width:24px
 .scl .lv5.on{background:#f0565a;border-color:#f0565a;color:#fff}
 .scalehint{display:flex;align-items:center;gap:8px;font:600 12px var(--body);color:var(--mut)}
 .scalehint i{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#35c776,#a3d94b,#f5b83d,#ff8a3d,#f0565a)}
+
+/* ayuda, por qué, opciones y resumen */
+.top{position:relative}
+.help{position:absolute;right:0;top:0;display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--line2);color:#c3c8d0;border-radius:99px;padding:7px 12px;font:600 13px var(--body)}
+.blk{cursor:pointer}.blk>svg.i{color:var(--dim)}
+.sd .sk{font:600 10px/1 var(--body);color:var(--mut);margin-top:3px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.sd.now .sk{color:var(--tx)}
+.why{display:flex;gap:9px;align-items:flex-start;font-size:14px;color:#c9ced6;background:#ffffff0a;border-radius:12px;padding:9px 11px;margin:10px 0 2px}
+.why svg.i{color:var(--acc2);margin-top:3px}
+.exd{margin:10px 0 2px}
+.exd summary{cursor:pointer;color:#c3c8d0;font-size:14px;font-weight:600;list-style:none;padding:8px 0}
+.exd summary::-webkit-details-marker{display:none}
+.exd summary b{color:var(--acc2);white-space:nowrap}
+.exd[open] summary b{display:none}
+.opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line2);color:var(--tx);border-radius:14px;padding:14px;margin:8px 0}
+.opt svg.i{width:22px;height:22px;color:var(--acc2)}.opt b{display:block;font-size:16px}.opt small{display:block;color:var(--mut);font-size:13px;margin-top:2px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qa{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--card);color:var(--tx);text-align:left}
+.qa svg.i{width:26px;height:26px}.qa b{font:800 22px/1 var(--disp);text-transform:uppercase;letter-spacing:.02em}.qa small{color:var(--mut);font-size:12.5px}
+.qa.moto{background:linear-gradient(155deg,#2a240a,var(--card) 70%);border-color:#4a420f}.qa.moto svg.i{color:var(--moto)}
+.qa.bici{background:linear-gradient(155deg,#0c2925,var(--card) 70%);border-color:#14443c}.qa.bici svg.i{color:var(--bici)}
+.coach .cl{display:flex;gap:10px;align-items:flex-start;padding:6px 0;font-size:14.5px}.coach .cl+.cl{border-top:1px solid #ffffff0d}
+.coach .cl svg.i{color:var(--acc2);margin-top:3px;width:18px;height:18px}
+.lgd{display:flex;gap:12px;align-items:center;padding:7px 0}
+dl.gl dt{font-weight:700;margin-top:12px}dl.gl dd{margin:2px 0 0;color:var(--mut);font-size:14px}
+.sheet .big{font:800 26px/1.05 var(--disp);text-transform:uppercase}
+.day .what b{font-weight:600}.day .what .mut{font-size:13px}
+.dots{display:inline-flex;gap:5px;vertical-align:middle;margin-left:6px}.dots i{width:10px;height:10px;border-radius:50%;background:var(--card3)}.dots i.on{background:var(--acc)}
 </style>
 </head>
 <body>
@@ -498,7 +526,9 @@ function sheet(h){$('#sheet').innerHTML=h?`<div class="sheetbg" data-act="closes
 function motoEn2(d){const x=addDays(d,2);return !!motoAt(x)||motoPlan(mondayOf(x)).includes(dow(x))}
 const GRIPMSG='Moto en 48 h: el agarre va liviano. En los ejercicios marcados, una serie menos y sin llegar al fallo, para que el antebrazo llegue recuperado.';
 function blockTag(){return `<span class="tag acc">Bloque ${S.block.cycle} · Sem ${S.block.week}/4</span>`+(S.retorno?'<span class="tag warn">Modo vuelta</span>':'')}
-function blockBar(){const w=S.block.week;return `<div class="blk"><div class="segs">${[1,2,3,4].map(i=>`<i class="${i<w?'p':i===w?'on':''}"></i>`).join('')}</div><span>Bloque ${S.block.cycle} · Semana ${w} de 4 · ${BLOCK[w]}</span>${S.retorno?'<span class="tag warn">Modo vuelta</span>':''}</div>`}
+function blockBar(){const w=S.block.week;return `<div class="blk" data-act="ayuda"><div class="segs">${[1,2,3,4].map(i=>`<i class="${i<w?'p':i===w?'on':''}"></i>`).join('')}</div><span>Bloque ${S.block.cycle} · Semana ${w} de 4 · ${BLOCK[w]}</span>${S.retorno?'<span class="tag warn">Modo vuelta</span>':''}${ic('info')}</div>`}
+const helpBtn=()=>`<button class="help" data-act="ayuda">${ic('info')} Ayuda</button>`;
+const gymDots=n=>`<span class="dots">${[0,1,2].map(i=>`<i class="${i<n?'on':''}"></i>`).join('')}</span>`;
 /* ============ Íconos e insignias ============ */
 const ICP={
  moto:'<circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M5 17l3.5-6h6.5l4 6"/><path d="M15 11l-1.6-3.5H17"/><path d="M8.5 11 7 8H4.5"/>',
@@ -514,7 +544,70 @@ function ic(n){return `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="cu
 function cat(k){return GYM.includes(k)?'gym':k==='MOTO'?'moto':['Z2','SUB','BICI'].includes(k)?'bici':k==='NOPUEDO'?'no':k==='PASADO'?'past':'rest'}
 function badge(k,sz=''){const c=cat(k);return `<span class="bdg ${c} ${sz}">${c==='gym'?k:ic({moto:'moto',bici:'bici',no:'x',past:'dot',rest:'moon'}[c])}</span>`}
 const MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-function weekStrip(P){return `<div class="strip">${P.days.map(p=>`<button class="sd ${p.today?'now':''} ${p.past?'past':''} ${p.done?'done':''}" data-act="dayopt" data-d="${p.date}"><span class="sl">${DIAS[p.i]}</span><span class="sn">${pd(p.date).getDate()}</span>${badge(p.kind,'sm')}</button>`).join('')}</div>`}
+function weekStrip(P){return `<div class="strip">${P.days.map(p=>`<button class="sd ${p.today?'now':''} ${p.past?'past':''} ${p.done?'done':''}" data-act="dayopt" data-d="${p.date}"><span class="sl">${DIAS[p.i]}</span><span class="sn">${pd(p.date).getDate()}</span>${badge(p.kind,'sm')}<span class="sk">${SHORT[p.kind]||''}</span></button>`).join('')}</div>`}
+const SHORT={A:'Piernas',B:'Espalda',C:'Circuito',MOTO:'Moto',Z2:'Bici',SUB:'Bici',BICI:'Bici',REC:'Suave',REST:'Descanso',LIBRE:'Libre',NOPUEDO:'No puedo',PASADO:'—',OTRO:'Otra'};
+const PURPOSE={A:'Fuerza de piernas y cadera: aguantar parado en los pedalines.',B:'Espalda alta, hombros y agarre: menos arm pump y mejor postura en la moto.',C:'Circuito que imita el esfuerzo de una vuelta de enduro.'};
+function kindParts(k){return SES[k]?[SES[k].name,SES[k].title]:k==='MOTO'?['Moto','']:ACT[k]?[ACT[k].name,ACT[k].title]:k==='NOPUEDO'?['No puedo','Lo que tocaba se reacomoda']:k==='PASADO'?['Sin anotar','Tocá para cargar lo que hiciste']:[k,'']}
+// ---------- Por qué toca esto ----------
+function motoOn(d){return !!motoAt(d)||motoPlan(mondayOf(d)).includes(dow(d))}
+function whyTxt(p){const k=p.kind,d=p.date;
+ if(p.swapped)return 'La cambiaste por cómo te sentías: el gym pasó a otro día.';
+ if(GYM.includes(k))return (p.moved?`Se corrió del ${DIAS_L[DEFIDX[k]]}: ese día no entraba (moto cerca, no podías u otra sesión). `:'')+PURPOSE[k];
+ if(k==='REST')return 'Mañana hay moto: hoy nada pesado, así llegás fresco.';
+ if(k==='REC')return motoAt(addDays(d,-1))?'Ayer anduviste en moto: hoy toca recuperar.':p.i===6?'Mañana arranca la semana con piernas: hoy suave.':'Día de recuperación.';
+ if(k==='LIBRE')return 'Lo de la semana ya está ubicado en otros días: hoy descansás.';
+ if(['Z2','SUB','BICI'].includes(k))return (p.moved?'Se corrió al primer día libre. ':'')+'La bici larga es lo que más baja el arm pump.';
+ return ''}
+const why=p=>{const x=whyTxt(p);return x?`<div class="why">${ic('info')}<span>${x}</span></div>`:''};
+// ---------- Coach: cómo venís, según el historial ----------
+function lastGymDay(){const t=todayStr();for(let i=0;i<=60;i++){const L=S.log[addDays(t,-i)];if(L&&L.status==='done'&&GYM.includes(L.type))return i}return null}
+function streak(){const mon=mondayOf(todayStr());let n=0;for(let w=1;w<=52&&gymCount(addDays(mon,-7*w))>=2;w++)n++;return n}
+function kgTrend(){const first={},last={};
+ for(const d of Object.keys(S.log).sort()){const ex=S.log[d].ex;if(!ex)continue;for(const id in ex){const k=+ex[id].kg;if(!k)continue;if(first[id]==null)first[id]=k;last[id]=k}}
+ return{up:Object.keys(first).filter(id=>last[id]>first[id]).sort((a,b)=>last[b]/first[b]-last[a]/first[a]),first,last}}
+function pumpTrend(){const ds=[...new Set([...Object.keys(S.moto),...Object.keys(S.log).filter(d=>S.log[d].type==='MOTO')])].sort();return ds.map(d=>z5(motoAt(d)||{},'pump')).filter(Boolean).slice(-4)}
+function insights(P,full){
+ const out=[],t=todayStr(),n=gymCount(mondayOf(t));
+ const left=P.days.filter(p=>GYM.includes(p.kind)&&!p.done&&!p.inprog&&p.date>=t);
+ if(n>=3)out.push(['check','Semana de gym completa: 3 de 3. Bien ahí.']);
+ else if(left.length)out.push(['gym',`Llevás ${n} de 3 gyms esta semana. Faltan: ${left.map(p=>SES[p.kind].name+(p.today?' hoy':' el '+DIAS_L[p.i])).join(', ')}.`]);
+ const st=streak();if(st>=2)out.push(['zap',`${st} semanas seguidas con 2 o más gyms. La constancia es lo que más rinde.`]);
+ const lg=lastGymDay();if(lg!=null&&lg>=6&&n===0)out.push(['clock',`Hace ${lg} días que no vas al gym: volvé con la versión liviana.`]);
+ const pv=pumpTrend();if(pv.length>=3){const a=pv[pv.length-1],b=pv.slice(0,-1).reduce((x,y)=>x+y,0)/(pv.length-1);
+  if(a<=b-1)out.push(['moto',`El arm pump viene bajando (${pv.join(' → ')} de 5). Lo que hacés funciona.`]);
+  else if(a>=b+1)out.push(['moto',`El arm pump viene subiendo (${pv.join(' → ')} de 5): no saltees la bici Z2 ni el Gym B.`])}
+ const kt=kgTrend();if(kt.up.length){const id=kt.up[0];out.push(['chart',`Subiste peso en ${kt.up.length} ejercicio${kt.up.length>1?'s':''}. El que más: ${EXNAME[id]||id}, de ${kt.first[id]} a ${kt.last[id]} kg.`])}
+ if(!out.length&&full)out.push(['info','Todavía hay pocos datos. A medida que anotes gym, moto y bici, acá vas a ver cómo venís.']);
+ return full?out:out.slice(0,3)}
+function coachCard(P,full){const L=insights(P,full);return L.length?`<h2>Cómo venís</h2><div class="card coach">${L.map(([i,x])=>`<div class="cl">${ic(i)}<span>${x}</span></div>`).join('')}</div>`:''}
+function ayudaSheet(){
+ const r=(k,tt,sub)=>`<div class="lgd">${badge(k)}<div><b>${tt}</b><div class="mut">${sub}</div></div></div>`;
+ sheet(`<h1>Qué es cada cosa</h1><h2>Tipos de día</h2>
+ ${GYM.map(g=>r(g,SES[g].name+' · '+SES[g].title,PURPOSE[g])).join('')}
+ ${r('MOTO','Moto','Salida de enduro. La planeás en Semana y la anotás cuando anduviste.')}
+ ${r('Z2','Bici','Larga y charlando (Z2), o con algunas subidas fuertes. Es lo que más baja el arm pump.')}
+ ${r('REST','Descanso o suave','Antes o después de la moto: nada pesado, como mucho bici suave y movilidad.')}
+ ${r('NOPUEDO','No puedo','Avisaste que ese día no podés: lo que tocaba se mueve solo.')}
+ <div class="note">Tilde verde = hecho. Gris = el día pasó sin anotar nada.</div>
+ <h2>Palabras</h2><dl class="gl">
+ <dt>Bloque de 4 semanas</dt><dd>Semanas 1 a 3 subís de a poco el peso. La 4 es de descarga (menos series) para recuperar. Pasás a la semana siguiente si hiciste 2 o más gyms; si no, se repite.</dd>
+ <dt>4 × 5</dt><dd>4 series de 5 repeticiones.</dd>
+ <dt>RPE</dt><dd>Qué tan duro fue, del 1 al 10. RPE 8 = te quedaban 2 repeticiones más; RPE 7 = te quedaban 3.</dd>
+ <dt>Sobró / Justo / No llegué</dt><dd>Lo marcás en cada ejercicio con peso. Con eso la app te sugiere el peso de la próxima vez.</dd>
+ <dt>Versión liviana y express</dt><dd>Liviana: una serie menos y sin subir peso, para días que estás cansado. Express: solo los ejercicios principales, unos 40 minutos.</dd>
+ <dt>Modo vuelta</dt><dd>Después de 2 semanas sin gym: pesos 10 % más bajos hasta completar una semana.</dd>
+ <dt>Arm pump</dt><dd>Antebrazos duros en la moto. Lo bajan la bici Z2, el Gym B y un buen setup de la moto (checklist en Ajustes).</dd></dl>
+ <div class="note">Las reglas completas de cómo arma la semana están en Ajustes.</div>
+ <button class="btn ghost" data-act="closesheet">Cerrar</button>`)}
+function cambiarSheet(d){
+ const P=planWeek(mondayOf(d)),p=P.days[dow(d)],o=(act,icn,tt,sub,ex='')=>`<button class="opt" data-act="${act}" data-d="${d}" ${ex}>${ic(icn)}<span><b>${tt}</b>${sub?`<small>${sub}</small>`:''}</span></button>`;
+ let h=`<h1>Cambiar lo de hoy</h1><div class="mut">Elegí qué pasa. El resto de la semana se acomoda solo.</div>`;
+ h+=o('nopuedo','x','Hoy no puedo','Lo que tocaba pasa al próximo día libre.');
+ h+=o('otro','bici','Hice otra cosa','Bici, elongación… y cómo estabas.');
+ if(GYM.includes(p.kind)&&!S.swap[d])h+=o('swaptoday','moon','Hoy prefiero algo suave','Bici suave o movilidad. El gym pasa a otro día.');
+ if(S.swap[d])h+=o('unswap','cal','Volver a lo planificado','');
+ for(const g of GYM.filter(g=>g!==p.kind&&!P.days.some(q=>q.kind===g&&(q.done||q.inprog))))h+=o('checkin','gym',`Hacer ${SES[g].name} en vez`,SES[g].title,`data-v="${g}"`);
+ sheet(h+`<button class="btn ghost" data-act="closesheet">Cancelar</button>`)}
 $('#tabs').innerHTML=[['hoy','zap','Hoy'],['semana','cal','Semana'],['progreso','chart','Progreso'],['ajustes','cog','Ajustes']].map(([v,i,l])=>`<button data-act="tab" data-v="${v}"><span>${ic(i)}</span>${l}</button>`).join('');
 function motoAt(d){return S.moto[d]||(S.log[d]&&S.log[d].type==='MOTO'?(S.log[d].moto||{}):null)}
 function motoPlan(mon){ // días (0=lun) con moto planeada; si no tocaste nada, el sábado
@@ -535,17 +628,19 @@ const scale=(k,v)=>`<div class="scl" id="z-${k}">${NIV.map((l,i)=>`<button class
 const ZN=k=>ZONAS.find(z=>z[0]===k)[1].replace(/ \(.*\)/,'');
 function actQuick(){
  const n=daysSinceMoto(),t=todayStr();
- const last=n==null?'sin registrar':n===0?'hoy':n===1?'ayer':'hace '+n+' días ('+fmtD(addDays(t,-n))+')';
- const row=(c,lab,has,act)=>`<div class="qrow ${c}"><span class="lab">${ic(c)} ${lab}</span>${['Hoy','Ayer','Anteayer'].map((l,k)=>{const d=addDays(t,-k);return `<button class="chip ${has(d)?'on':''}" data-act="${act}" data-d="${d}">${l}</button>`}).join('')}</div>`;
- return `<h2>¿Anduviste?</h2><div class="card"><div class="mut">Última moto: <b style="color:var(--tx)">${last}</b>. Tocá el día y la semana se acomoda.</div>${row('moto','Moto',motoAt,'motoask')}${row('bici','Bici',d=>S.bici[d],'biciask')}<div class="note">Para otro día o para planear las próximas salidas: pestaña Semana.</div></div>`}
+ let nb=null;for(let i=0;i<=60;i++)if(S.bici[addDays(t,-i)]){nb=i;break}
+ const ago=x=>x==null?'Sin salidas anotadas':'Última: '+(x===0?'hoy':x===1?'ayer':'hace '+x+' días');
+ return `<h2>¿Anduviste?</h2><div class="duo"><button class="qa moto" data-act="motoask" data-d="${t}">${ic('moto')}<b>Moto</b><small>${ago(n)}</small></button><button class="qa bici" data-act="biciask" data-d="${t}">${ic('bici')}<b>Bici</b><small>${ago(nb)}</small></button></div><div class="note">Anotalo aunque sea de ayer o anteayer: la semana se acomoda sola.</div>`}
+function dayPick(d,act){const t=todayStr();if(d>t||d<addDays(t,-2))return `<div class="mut">${fmtD(d)}</div>`;
+ return `<div class="q"><div class="k">¿Qué día?</div><div class="chips">${['Hoy','Ayer','Anteayer'].map((l,k)=>{const x=addDays(t,-k);return `<button class="chip ${x===d?'on':''}" data-act="${act}" data-d="${x}">${l}</button>`}).join('')}</div></div>`}
 function biciSheet(d,tipo){const b=S.bici[d]||{},tp=b.tipo||tipo||'Z2';
- sheet(`<h1>Bici · ${fmtD(d)}</h1>
+ sheet(`<h1>Bici</h1>${dayPick(d,'biciask')}
  <div class="q"><div class="k">Minutos</div><input type="number" id="bm" inputmode="numeric" placeholder="ej. 90" value="${esc(b.min)}"></div>
  <div class="q"><div class="k">Cómo fue</div><div class="chips" id="bt">${[['Z2','Z2 · largo, charlando'],['SUB','Fuerte / subidas'],['REC','Suave / recuperación']].map(([v,l])=>`<button class="chip ${tp===v?'on':''}" data-act="mpick" data-v="${v}">${l}</button>`).join('')}</div></div>
  <div class="q"><div class="k">Notas</div><textarea id="bn" placeholder="MTB o ruta, recorrido...">${esc(b.notas)}</textarea></div>
  <button class="btn" data-act="bicisave" data-d="${d}">Guardar</button>${S.bici[d]?`<button class="btn ghost" data-act="bicidel" data-d="${d}">Borrar esta salida</button>`:''}<button class="btn ghost" data-act="closesheet">Cancelar</button>`)}
 function motoSheet(d){const m=S.moto[d]||(motoAt(d)||{}),t=todayStr();
- sheet(`<h1>Moto · ${fmtD(d)}</h1>
+ sheet(`<h1>Moto</h1>${dayPick(d,'motoask')}
  <div class="q"><div class="k">Horas</div><input type="number" id="mh" inputmode="decimal" step="0.5" placeholder="ej. 1.5" value="${esc(m.horas)}"></div>
  <h2>¿Cómo quedaste?</h2>
  <div class="scalehint"><span>1 · nada</span><i></i><span>5 · al límite</span></div><div class="note" style="margin-top:2px">Más alto = más cargado o dolorido. Lo que no sientas, dejalo vacío.</div>
@@ -558,7 +653,7 @@ function motoSheet(d){const m=S.moto[d]||(motoAt(d)||{}),t=todayStr();
 /* ============ Vista HOY ============ */
 function renderHoy(){
  const t=todayStr(),P=planWeek(mondayOf(t)),p=P.days[dow(t)];
- let h=`<header class="top"><div class="eyebrow">${DIAS_L[dow(t)]} ${pd(t).getDate()} de ${MES[pd(t).getMonth()]}</div><h1 class="ttl">Hoy</h1>${blockBar()}</header>`;
+ let h=`<header class="top">${helpBtn()}<div class="eyebrow">${DIAS_L[dow(t)]} ${pd(t).getDate()} de ${MES[pd(t).getMonth()]}</div><h1 class="ttl">Hoy</h1>${blockBar()}</header>`;
  if(S.weekMsg)h+=`<div class="ban"><button data-act="dismiss">✕</button>${esc(S.weekMsg)}</div>`;
  if(S.draft&&S.draft.date!==t)h+=`<div class="ban warn">Quedó sin terminar ${SES[S.draft.type].name} del ${fmtD(S.draft.date)}.<div class="row"><button class="btn sm" data-act="resume">Abrir y terminar</button><button class="btn sm ghost" data-act="discard">Descartar</button></div></div>`;
  const lm=lastMoto();
@@ -577,6 +672,7 @@ function renderHoy(){
  if(dow(tm)!==0){const q=P.days[dow(tm)];h+=`<div class="next">${badge(q.kind,'sm')}<div><span class="mut">Mañana</span> <b>${kindName(q.kind)}</b>${q.moved?' <span class="mut">(movida)</span>':''}</div></div>`}
  else h+=`<div class="next">${badge('A','sm')}<div><span class="mut">Mañana</span> <b>semana nueva: Gym A</b></div></div>`;
  h+=actQuick();
+ h+=coachCard(P,false);
  return h}
 function heroCard(p,P){
  const t=p.date,hd=(k,eb,big,sub,lg)=>`<div class="hh">${lg||badge(k,'lg')}<div><div class="eyebrow">${eb}</div><div class="big">${big}</div></div></div>${sub?`<div class="sub">${sub}</div>`:''}`,okb=`<span class="bdg lg ok">${ic('check')}</span>`;
@@ -590,10 +686,11 @@ function heroCard(p,P){
  const k=p.kind;let h=`<div class="card hero ${cat(k)}">`;
  if(SES[k]){
   const s=SES[k];
-  h+=hd(k,`${p.moved?'Reprogramada para hoy':'Toca hoy'} · ${ic('clock')} ~${s.min} min`,s.title);
+  h+=hd(k,`${p.moved?'Movida a hoy':'Toca hoy'} · ${ic('clock')} ~${s.min} min`,s.title);
+  h+=why(p);
   if(S.block.week===4)h+=`<div class="tag warn" style="margin-top:8px">Descarga: menos series</div>`;
   if(motoEn2(t)&&s.ex.some(e=>e.grip))h+=`<div class="ban warn">${GRIPMSG}</div>`;
-  h+=`<ul class="exl">${s.ex.map(e=>`<li data-act="how" data-id="${e.id}">${thumb(e.id)}<span class="nm">${esc(e.n)}</span><b>${e.s} × ${esc(e.r)}</b></li>`).join('')}</ul>`;
+  h+=`<details class="exd"><summary>${s.ex.length} ejercicios: ${esc(s.ex[0].n)}, ${esc(s.ex[1].n)}… <b>Ver todos ▾</b></summary><ul class="exl">${s.ex.map(e=>`<li data-act="how" data-id="${e.id}">${thumb(e.id)}<span class="nm">${esc(e.n)}</span><b>${e.s} × ${esc(e.r)}</b></li>`).join('')}</ul><div class="note">Tocá un ejercicio para ver cómo se hace.</div></details>`;
   h+=`<button class="btn" data-act="checkin" data-v="${k}">${ic('play')} Empezar</button>`;
  }else if(k==='MOTO'){
   h+=hd(k,'Toca hoy','Moto','Antes de salir (10\')');
@@ -602,11 +699,12 @@ function heroCard(p,P){
  }else{
   const a=ACT[k];
   h+=hd(k,p.moved?'Movida a hoy':p.swapped?'Cambiada por cómo te sentías':'Toca hoy',a.name,a.title);
+  h+=why(p);
   h+=`<ul class="tips">${a.li.map(x=>`<li>${x}</li>`).join('')}${p.note?`<li><b>${p.note}</b></li>`:''}</ul>`;
   h+=`<div class="row"><label class="kg"><input type="number" id="actmin" inputmode="numeric" placeholder="min"> minutos</label></div><button class="btn okb" data-act="actdone" data-v="${k}">${ic('check')} Hecho</button>`;
  }
- h+=`<button class="btn ghost" data-act="otro" data-d="${t}">Hice otra cosa (bici, elongar…)</button><button class="btn link" data-act="nopuedo" data-d="${t}">Hoy no puedo</button>`;
- return h+'</div>'+otherSessions(P)}
+ h+=`<button class="btn ghost" data-act="cambiar" data-d="${t}">Hoy no puedo / cambiar</button>`;
+ return h+'</div>'}
 function otroSheet(d){const L=S.log[d]&&S.log[d].type==='OTRO'?S.log[d]:{},b=S.bici[d]||{};
  const ch=(id,opts,v)=>`<div class="chips" id="${id}">${opts.map(([k,l])=>`<button class="chip ${v==k?'on':''}" data-act="mpick" data-v="${k}">${l}</button>`).join('')}</div>`;
  sheet(`<h1>Otra cosa · ${fmtD(d)}</h1><div class="mut">En vez de lo planeado. La sesión de gym se mueve a otro día si entra.</div>
@@ -706,43 +804,44 @@ function tick(){
 /* ============ Vista SEMANA ============ */
 function weekBlock(mon,title){
  const P=planWeek(mon);
- const chipRow=(lab,v)=>`<div class="qrow ${v==='MOTO'?'moto':'bici'}" style="gap:4px"><span class="lab" style="width:62px;font-size:14px">${lab}</span>${P.days.map(p=>{const on=v==='MOTO'?(P.MP.includes(p.i)||!!motoAt(p.date)):(S.plan[p.date]==='BICI'||!!S.bici[p.date]);return `<button class="chip ${on?'on':''}" style="padding:6px 0;flex:1;font-size:13px${p.past?';opacity:.35':''}" ${p.past?'disabled':''} data-act="plan" data-d="${p.date}" data-v="${v}">${DIAS[p.i]}</button>`}).join('')}</div>`;
- let h=`<h2>${title}</h2><div class="card"><div class="hd"><div class="k">Planear salidas</div></div>${chipRow(ic('moto')+' Moto','MOTO')}${chipRow(ic('bici')+' Bici','BICI')}<div class="chips"><button class="chip ${P.MP.length?'':'on'}" data-act="nomoto" data-d="${mon}">Sin moto esta semana</button></div></div>`;
+ let h=`<h2>${title}</h2>`;
  if(P.dropped.length)h+=`<div class="ban bad">No entra ${P.dropped.map(g=>SES[g].name).join(' ni ')}.</div>`;
  h+='<div class="card" style="padding:0">';
  for(const p of P.days){
   let st='';
   if(p.done)st='<span class="tag ok">Hecho</span>';else if(p.inprog)st='<span class="tag warn">En curso</span>';
   else if(p.kind==='NOPUEDO')st='<span class="tag">No puedo</span>';else if(p.planned)st='<span class="tag acc">Planeada</span>';else if(p.moved)st='<span class="tag warn">Movida</span>';else if(p.swapped)st='<span class="tag warn">Cambiada</span>';
-  h+=`<div class="day ${p.today?'today':''} ${p.past?'past':''}" data-act="dayopt" data-d="${p.date}"><div class="d">${DIAS[p.i]}<small>${pd(p.date).getDate()}/${pd(p.date).getMonth()+1}</small></div>${badge(p.kind)}<div class="what">${kindName(p.kind)}${p.plusMoto?' + Moto 🏍':''}${p.plusBici?' + Bici 🚴':''}${p.note?`<div class="note">${p.note}</div>`:''}</div><div class="st">${st}</div></div>`}
- return h+'</div>'}
+  h+=`<div class="day ${p.today?'today':''} ${p.past?'past':''}" data-act="dayopt" data-d="${p.date}"><div class="d">${DIAS[p.i]}<small>${pd(p.date).getDate()}/${pd(p.date).getMonth()+1}</small></div>${badge(p.kind)}<div class="what"><b>${kindParts(p.kind)[0]}</b>${p.plusMoto?' + Moto':''}${p.plusBici?' + Bici':''}${kindParts(p.kind)[1]?`<div class="mut">${esc(kindParts(p.kind)[1])}</div>`:''}${p.note?`<div class="note">${p.note}</div>`:''}</div><div class="st">${st}</div></div>`}
+ h+='</div>';
+ return h+(P.MP.length?`<button class="btn link" data-act="nomoto" data-d="${mon}">Esta semana no ando en moto</button>`:`<div class="note">Sin moto planeada: tocá un día para agregar una.</div>`)}
 function renderSemana(){
  const t=todayStr(),mon=mondayOf(t),nm=addDays(mon,7),f=d=>pd(d).getDate()+'/'+(pd(d).getMonth()+1);
- let h=`<header class="top"><div class="eyebrow">Gym esta semana: ${gymCount(mon)} de 3</div><h1 class="ttl">Semana</h1>${blockBar()}</header>`;
- h+=`<div class="note">Marcá los días que pensás andar (podés marcar varios). Antes y después de una moto no pone gym, y 2 días antes no pone piernas pesadas. Una bici planeada reemplaza al Z2 del martes.</div>`;
+ let h=`<header class="top">${helpBtn()}<div class="eyebrow">Gym esta semana: ${gymCount(mon)} de 3${gymDots(gymCount(mon))}</div><h1 class="ttl">Semana</h1>${blockBar()}</header>`;
+ h+=`<div class="ban">Tocá un día para <b>planear moto o bici</b>, avisar que <b>no podés</b> o <b>anotar</b> lo que hiciste. El gym se acomoda solo alrededor de la moto.</div>`;
  h+=weekBlock(mon,'Esta semana · '+f(mon))+weekBlock(nm,'Próxima semana · '+f(nm));
  const pm=addDays(mon,-7);h+=`<h2>Semana pasada · ${f(pm)}</h2><div class="card" style="padding:0">${[0,1,2,3,4,5,6].map(i=>{const d=addDays(pm,i),L=S.log[d],x=[L&&L.type!=='MOTO'?kindName(L.type):'',motoAt(d)?'Moto 🏍':'',S.bici[d]&&!(L&&L.type==='OTRO')?'Bici 🚴':''].filter(Boolean).join(' + ');
   return `<div class="day past" data-act="dayopt" data-d="${d}"><div class="d">${DIAS[i]}<small>${pd(d).getDate()}/${pd(d).getMonth()+1}</small></div><div class="what">${x||'<span class="mut">Sin anotar · tocá para cargar</span>'}</div></div>`}).join('')}</div>`;
- return h+'<div class="note">Tocá un día para marcar que no podés, planear o registrar algo que hiciste.</div>'}
+ return h}
 function dayOptions(d){
- const t=todayStr(),L=S.log[d];
- let h=`<h1>${fmtD(d)}</h1>`;
+ const t=todayStr(),L=S.log[d],p=planWeek(mondayOf(d)).days[dow(d)],[nm,sub]=kindParts(p.kind);
+ let h=`<div class="hh" style="margin-top:8px">${badge(p.kind,'lg')}<div><div class="eyebrow">${fmtD(d)}${d===t?' · hoy':''}</div><div class="big">${nm}</div>${sub?`<div class="mut">${esc(sub)}</div>`:''}</div></div>`;
+ if(d>=t&&!p.done)h+=why(p);
  if(motoAt(d))h+=`<div class="row"><span class="tag acc">Moto 🏍</span><button class="btn sm ghost" data-act="motoask" data-d="${d}">Ver / editar moto</button></div>`;
  if(S.bici[d])h+=`<div class="row"><span class="tag acc">Bici 🚴</span><button class="btn sm ghost" data-act="biciask" data-d="${d}">Ver / editar bici</button></div>`;
  if(d>=t&&!motoAt(d)&&!S.bici[d]){const pm=motoPlan(mondayOf(d)).includes(dow(d)),pb=S.plan[d]==='BICI';
-  h+=`<h2>Planear</h2><div class="row"><button class="btn sm ${pm?'':'ghost'}" data-act="plan" data-d="${d}" data-v="MOTO">🏍 Moto${pm?' ✓':''}</button><button class="btn sm ${pb?'':'ghost'}" data-act="plan" data-d="${d}" data-v="BICI">🚴 Bici${pb?' ✓':''}</button></div>`}
+  h+=`<h2>Planear salida</h2><div class="mut">Marcá si pensás andar ese día: el gym se acomoda alrededor.</div><div class="row"><button class="btn sm ${pm?'':'ghost'}" data-act="plan" data-d="${d}" data-v="MOTO">🏍 Moto${pm?' ✓':''}</button><button class="btn sm ${pb?'':'ghost'}" data-act="plan" data-d="${d}" data-v="BICI">🚴 Bici${pb?' ✓':''}</button></div>`}
  if(L&&L.type!=='MOTO'){h+=`<div class="mut">Registrado: <b>${kindName(L.type)}</b></div><button class="btn ghost" data-act="unlog" data-d="${d}">Borrar este registro</button>`}
  else{
   if(d>=t){h+=S.unav[d]?`<button class="btn" data-act="canday" data-d="${d}">Ese día sí puedo</button>`:`<button class="btn" data-act="nopuedo" data-d="${d}">Ese día no puedo ir</button>`;
    if(S.swap[d])h+=`<button class="btn ghost" data-act="unswap" data-d="${d}">Volver a lo planificado</button>`}
-  if(d<=t){h+=`<h2>Registrar lo que hice</h2><div class="row">${['A','B','C'].map(k=>`<button class="btn sm ghost" data-act="quicklog" data-d="${d}" data-v="${k}">${SES[k].name}</button>`).join('')}<button class="btn sm ghost" data-act="motoask" data-d="${d}">🏍 Moto</button><button class="btn sm ghost" data-act="biciask" data-d="${d}">🚴 Bici</button><button class="btn sm ghost" data-act="otro" data-d="${d}">Otra cosa</button><button class="btn sm ghost" data-act="quicklog" data-d="${d}" data-v="REST">Descanso</button></div><div class="note">Registro rápido del gym, sin cargas. Sirve para que la semana se reacomode bien.</div>`}
+  if(d<=t){h+=`<h2>Anotar lo que hice</h2><div class="row">${['A','B','C'].map(k=>`<button class="btn sm ghost" data-act="quicklog" data-d="${d}" data-v="${k}">${SES[k].name}</button>`).join('')}<button class="btn sm ghost" data-act="motoask" data-d="${d}">🏍 Moto</button><button class="btn sm ghost" data-act="biciask" data-d="${d}">🚴 Bici</button><button class="btn sm ghost" data-act="otro" data-d="${d}">Otra cosa</button><button class="btn sm ghost" data-act="quicklog" data-d="${d}" data-v="REST">Descanso</button></div><div class="note">Registro rápido del gym, sin cargas. Sirve para que la semana se reacomode bien.</div>`}
  }
  h+=`<button class="btn ghost" data-act="closesheet">Cerrar</button>`;sheet(h)}
 
 /* ============ Vista PROGRESO ============ */
 function renderProgreso(){
  const t=todayStr(),mon=mondayOf(t);
- let h='<header class="top"><h1 class="ttl">Progreso</h1></header><h2>Sesiones de gym por semana</h2><div class="card"><div class="bars">';
+ let h='<header class="top"><h1 class="ttl">Progreso</h1></header>'+coachCard(planWeek(mon),true)+'<h2>Sesiones de gym por semana</h2><div class="card"><div class="bars">';
  for(let w=7;w>=0;w--){const m=addDays(mon,-7*w),n=gymCount(m);h+=`<div style="height:${Math.max(4,n/3*100)}%;${n<2?'background:#6b4a33':''}" title="${n}/3"><span>${pd(m).getDate()}/${pd(m).getMonth()+1}</span></div>`}
  h+='</div><div style="height:18px"></div><div class="note">Cada barra es una semana (máx 3). Las oscuras tuvieron menos de 2 sesiones.</div></div>';
  const dates=Object.keys(S.log).sort();
@@ -786,7 +885,7 @@ function renderAjustes(){
  <div class="q"><div class="k">Token</div><input id="ght" type="password" autocomplete="off" placeholder="${c.token?'guardado (pegá otro para cambiarlo)':'github_pat_...'}"></div>
  <button class="btn" data-act="ghsave">Guardar y enviar</button>${c.token?`<button class="btn ghost" data-act="ghsync">Enviar ahora</button><button class="btn link" data-act="ghoff">Desconectar</button>`:''}
  <div class="mut" style="margin-top:6px">${c.err?'⚠️ Último error: '+esc(c.err):c.last?'Último envío: '+new Date(c.last).toLocaleString('es-AR'):'Todavía no se envió nada.'}</div></div>`}
- h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v17</div>`;
+ h+=`<h2>Datos</h2><div class="card"><div class="note" style="margin-bottom:8px">Todo se guarda en este celular. Exportá una copia de vez en cuando.</div><button class="btn ghost" data-act="export">Exportar copia (.json)</button><button class="btn ghost" data-act="import">Importar copia</button><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn ghost" style="color:var(--bad)" data-act="reset">Borrar todo</button></div><div class="foot">Enduro Gym · v18</div>`;
  return h}
 
 /* ============ Render ============ */
@@ -833,6 +932,8 @@ document.addEventListener('click',e=>{
  case 'nopuedo':replanDo(()=>{S.unav[d]=true});break;
  case 'canday':replanDo(()=>{delete S.unav[d]});break;
  case 'dayopt':dayOptions(d);break;
+ case 'ayuda':ayudaSheet();break;
+ case 'cambiar':cambiarSheet(d);break;
  case 'how':howSheet(id);break;
  case 'quicklog':if(v==='MOTO'){motoSheet(d);break}if(['Z2','SUB','REC'].includes(v)){biciSheet(d,v);break}replanDo(()=>{S.log[d]={type:v,status:'done',quick:true};delete S.unav[d];delete S.swap[d]});break;
  case 'unlog':if(confirm('¿Borrar el registro del '+fmtD(d)+'?'))replanDo(()=>{delete S.log[d]});break;

@@ -1,5 +1,5 @@
 // Cache para que funcione sin señal en el gym. Subir la versión al cambiar archivos.
-const C = 'enduro-gym-v17';
+const C = 'enduro-gym-v18';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 // Fotos de los ejercicios: se bajan al instalar, así se ven sin señal. Si alguna falla, no frena la instalación.
 const IMGS = ['./img/ex/a1-0.jpg', './img/ex/a1-1.jpg', './img/ex/a2-0.jpg', './img/ex/a2-1.jpg', './img/ex/a3-0.jpg', './img/ex/a3-1.jpg', './img/ex/a4-1.jpg', './img/ex/a5-0.jpg', './img/ex/a5-1.jpg', './img/ex/a6-0.jpg', './img/ex/a6-1.jpg', './img/ex/b1-0.jpg', './img/ex/b1-1.jpg', './img/ex/b2-0.jpg', './img/ex/b2-1.jpg', './img/ex/b3-0.jpg', './img/ex/b3-1.jpg', './img/ex/b4-0.jpg', './img/ex/b4-1.jpg', './img/ex/b5-0.jpg', './img/ex/b5-1.jpg', './img/ex/b6-0.jpg', './img/ex/b6-1.jpg', './img/ex/b7-0.jpg', './img/ex/b8-0.jpg', './img/ex/b8-1.jpg', './img/ex/bf-0.jpg', './img/ex/bf-1.jpg', './img/ex/c1-0.jpg', './img/ex/c1-1.jpg', './img/ex/c2-0.jpg', './img/ex/c2-1.jpg', './img/ex/c4-0.jpg', './img/ex/c4-1.jpg', './img/ex/c5-0.jpg', './img/ex/c5-1.jpg', './img/ex/pu-0.jpg', './img/ex/pu-1.jpg', './img/ex/sw-0.jpg', './img/ex/sw-1.jpg', './img/ex/nd-0.jpg', './img/ex/nd-1.jpg', './img/ex/nk-0.jpg', './img/ex/nk-1.jpg', './img/ex/mc-0.jpg', './img/ex/mc-1.jpg', './img/ex/hx-0.jpg'];
