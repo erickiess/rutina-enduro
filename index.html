@@ -302,7 +302,7 @@ const SES={
   {id:'a6',n:'Pallof press en polea',s:3,r:'10 por lado',rest:45,kg:1,inc:2.5},
   {id:'a8',n:'Extensión lumbar quieta',s:3,r:'30-45"',rest:45,secs:40,note:'Aguante de la espalda baja: lo que pide ir parado en la moto.'}]},
  B:{name:'Gym B',title:'Espalda alta, hombros, agarre',min:70,warm:"Remo o bici 5', band pull-aparts 2x15, rotaciones de hombro.",ex:[
-  {id:'b1',grip:1,n:'Dominadas lastradas',s:4,r:'5-6',rest:150,kg:1,inc:2.5,core:1,note:'kg = lastre'},
+  {id:'b1',grip:1,n:'Dominadas lastradas',s:4,r:'5-6',rest:150,kg:1,inc:2.5,core:1,lastre:1,note:'kg = lastre. Vacío = sin lastre.'},
   {id:'b2',n:'Remo con pecho apoyado',s:4,r:'10',rest:90,kg:1,inc:2.5,core:1,note:'Apretar escápulas 1" arriba'},
   {id:'b3',n:'Press de hombro (mancuerna de pie o landmine)',s:3,r:'8',rest:120,kg:1,inc:2,core:1},
   {id:'b4',n:'Face pull',s:3,r:'15',rest:60,kg:1,inc:2.5},
@@ -413,7 +413,16 @@ async function syncNow(manual){
 let view='hoy',CI=null,UI={pre:{}};
 
 function gymCount(mon){let n=0;for(let i=0;i<7;i++){const L=S.log[addDays(mon,i)];if(L&&L.status==='done'&&GYM.includes(L.type))n++}return n}
+// Peso guardado de un ejercicio con 0 series (versiones viejas): vuelve al último que se hizo de verdad. No hace nada si ya está bien.
+function repairData(){
+ const ds=Object.keys(S.log).sort();
+ for(const id in S.weights){const w=S.weights[id],x=S.log[w.date]&&S.log[w.date].ex&&S.log[w.date].ex[id];
+  if(!x||x.sets!==0||x.feel)continue;
+  const f=ds.filter(d=>d<w.date).reverse().find(d=>{const L=S.log[d],y=L.ex&&L.ex[id];return y&&y.sets>0&&y.kg!==''&&y.kg!=null&&L.bw!==4&&!(L.mode&&L.mode.light)});
+  if(f){const y=S.log[f].ex[id];S.weights[id]={kg:+y.kg,feel:y.feel||'justo',date:f}}else delete S.weights[id]}
+ for(const d of ds){const ex=S.log[d].ex;if(ex)for(const id in ex)if(ex[id].sets===0&&!ex[id].feel)ex[id].kg=''}}
 function processWeeks(){
+ repairData();
  const cur=mondayOf(todayStr());
  if(!S.lastWeek){S.lastWeek=cur;S.start=todayStr();save();return}
  while(S.lastWeek<cur){
@@ -514,6 +523,7 @@ function suggestKg(id,inc,mode){
  else if(w.feel==='sobro'){kg+=bw===1?inc:inc*2;why='la última te sobró'}
  else if(w.feel==='justo'){if(bw>1){kg+=inc;why='progresión semana '+bw}else why='semana base'}
  else if(w.feel==='no'){if(bw===1){kg-=inc;why='la última no llegaste'}else why='la última no llegaste: repetí'}
+ else if(w.feel==='parcial')why='la última quedó incompleta: repetí';
  if(S.retorno){kg*=0.9;why='modo vuelta (-10%)'}
  return{kg:round(kg,inc),why}}
 function setsFor(e,mode){let s=e.s;if(S.block.week===4)s=Math.max(1,Math.round(s*0.6));if(mode.light)s=Math.max(Math.min(2,s),s-1);return s}
@@ -566,11 +576,17 @@ function kgTrend(){const first={},last={};
  for(const d of Object.keys(S.log).sort()){const ex=S.log[d].ex;if(!ex)continue;for(const id in ex){const k=+ex[id].kg;if(!k)continue;if(first[id]==null)first[id]=k;last[id]=k}}
  return{up:Object.keys(first).filter(id=>last[id]>first[id]).sort((a,b)=>last[b]/first[b]-last[a]/first[a]),first,last}}
 function pumpTrend(){const ds=[...new Set([...Object.keys(S.moto),...Object.keys(S.log).filter(d=>S.log[d].type==='MOTO')])].sort();return ds.map(d=>z5(motoAt(d)||{},'pump')).filter(Boolean).slice(-4)}
+// El mismo motivo repetido en las últimas 3 veces de un ejercicio.
+function motivosRep(){const seen={},c={};
+ for(const f of Object.keys(S.log).sort().reverse()){const ex=S.log[f].ex;if(!ex)continue;
+  for(const id in ex){seen[id]=(seen[id]||0)+1;const x=ex[id];if(seen[id]<=3&&x.why&&x.why!=='hecho'&&x.sets<x.of){const k=id+'|'+x.why;c[k]=(c[k]||0)+1}}}
+ return Object.keys(c).filter(k=>c[k]>=2).map(k=>{const[id,why]=k.split('|');return{id,why,n:c[k]}}).sort((a,b)=>(b.why==='dolor')-(a.why==='dolor')||b.n-a.n)}
 function insights(P,full){
  const out=[],t=todayStr(),n=gymCount(mondayOf(t));
  const left=P.days.filter(p=>GYM.includes(p.kind)&&!p.done&&!p.inprog&&p.date>=t);
  if(n>=3)out.push(['check','Semana de gym completa: 3 de 3. Bien ahí.']);
  else if(left.length)out.push(['gym',`Llevás ${n} de 3 gyms esta semana. Faltan: ${left.map(p=>SES[p.kind].name+(p.today?' hoy':' el '+DIAS_L[p.i])).join(', ')}.`]);
+ for(const m of motivosRep().slice(0,2))out.push(m.why==='dolor'?['info',`${EXNAME[m.id]||m.id}: ${m.n} veces con molestia. Bajá la carga o cambialo, y si sigue, consultá.`]:['info',`${EXNAME[m.id]||m.id}: quedó ${m.n} veces sin terminar (${motivoName(m.why).toLowerCase()}). Conviene cambiarlo: contale a Claude.`]);
  const st=streak();if(st>=2)out.push(['zap',`${st} semanas seguidas con 2 o más gyms. La constancia es lo que más rinde.`]);
  const lg=lastGymDay();if(lg!=null&&lg>=6&&n===0)out.push(['clock',`Hace ${lg} días que no vas al gym: volvé con la versión liviana.`]);
  const pv=pumpTrend();if(pv.length>=3){const a=pv[pv.length-1],b=pv.slice(0,-1).reduce((x,y)=>x+y,0)/(pv.length-1);
@@ -751,6 +767,24 @@ function startWorkout(type,mode){
   if(e.items)for(const it of e.items)if(it.id){const s2=suggestKg(it.id,it.inc,mode);d.ex[it.id]={kg:s2?s2.kg:'',sug:s2,feel:null}}
  }
  S.draft=d;save();view='work';sheet('');render();scrollTo(0,0);keepAwake(true)}
+// ---------- Notas y motivos por ejercicio ----------
+// Quedan en log[fecha].ex[id].why y .nota, y suben con el historial para que Claude los lea.
+const MOTIVOS=[['hecho','Lo hice, no lo marqué'],['tiempo','Sin tiempo'],['cansado','Cansado'],['dolor','Molestia o dolor'],['equipo','No hay equipo'],['cambio','Hice otro en su lugar'],['nogusta','No me sale o no me gusta'],['otro','Otra cosa']];
+const MOTIVOPH={dolor:'¿Dónde te molestó?',equipo:'¿Qué faltó?',cambio:'¿Cuál hiciste?',nogusta:'¿Qué no sale?'};
+function motivoName(k){const m=MOTIVOS.find(m=>m[0]===k);return m?m[1]:k}
+function notaTxt(x){return[x.why&&x.why!=='hecho'?motivoName(x.why):'',x.nota||''].filter(Boolean).join(' · ')}
+function ultimaNota(id){for(const f of Object.keys(S.log).sort().reverse()){const L=S.log[f],x=L.ex&&L.ex[id];if(x)return notaTxt(x)}return''}
+function faltan(d){return visibleEx(d.type,d.mode).filter(e=>d.ex[e.id]&&d.ex[e.id].done&&!d.ex[e.id].done.every(Boolean))}
+function faltanSheet(){
+ const d=S.draft,o=$('.sheet'),sc=o?o.scrollTop:0;
+ let h=`<h1>¿Qué pasó con estos?</h1><div class="mut">Te quedaron sin terminar. Elegí un motivo: sirve para ir ajustando la rutina. Si no querés, dejalo vacío.</div>
+ <div class="q"><div class="k">Para todos los que no marques</div><div class="chips"><button class="chip" data-act="motivotodos" data-v="tiempo">Sin tiempo</button><button class="chip" data-act="motivotodos" data-v="cansado">Cansado</button></div></div>`;
+ for(const e of faltan(d)){const x=d.ex[e.id],n=x.done.filter(Boolean).length;
+  h+=`<div class="sub"><div class="t">${esc(e.n)}</div><div class="mut">${n} de ${x.done.length} ${e.circuit?'rondas':'series'}</div><div class="chips">${MOTIVOS.map(([k,l])=>`<button class="chip ${x.why===k?'on':''}" data-act="motivo" data-id="${e.id}" data-v="${k}">${l}</button>`).join('')}</div>`;
+  if((x.why&&x.why!=='hecho')||x.nota)h+=`<input type="text" style="width:100%;margin-top:8px;font-size:15px;font-weight:400" data-nota="${e.id}" value="${esc(x.nota||'')}" placeholder="${MOTIVOPH[x.why]||'¿Qué pasó? (opcional)'}">`;
+  h+='</div>'}
+ sheet(h+`<div style="height:12px"></div><button class="btn okb" data-act="finishok">${ic('check')} Guardar y terminar</button><button class="btn ghost" data-act="closesheet">Seguir entrenando</button>`);
+ if(o){const n=$('.sheet');n.style.animation='none';$('.sheetbg').style.animation='none';n.scrollTop=sc}}
 function kgBlock(id,x){return `<label class="kg"><input type="number" inputmode="decimal" step="0.5" data-kg="${id}" value="${esc(x.kg)}" placeholder="kg"> kg</label>${x.sug?`<span class="sug">Sugerido ${x.sug.kg} kg · ${x.sug.why}</span>`:'<span class="sug">Primera vez: anotá con cuánto hacés</span>'}
  <div class="chips">${[['sobro','Sobró'],['justo','Justo'],['no','No llegué']].map(([v,l])=>`<button class="chip ${x.feel===v?'on':''}" data-act="feel" data-id="${id}" data-v="${v}">${l}</button>`).join('')}</div>`}
 function renderWork(){
@@ -767,6 +801,7 @@ function renderWork(){
   const all=x.done.every(Boolean);
   h+=`<div class="ex ${all?'alldone':''}"><div class="exh"><span class="n">${all?ic('check'):String(num).padStart(2,'0')}</span><div><div class="t">${esc(e.n)}</div>${e.grip&&motoEn2(d.date)?'<span class="tag warn">Agarre liviano</span>':''}<div><span class="sr">${x.done.length} × ${esc(e.r)}</span> <span class="mut">· pausa ${e.rest?(e.rest>=60?(e.rest/60)+"'":e.rest+'"'):'–'}</span></div><button class="howl" data-act="how" data-id="${e.id}">${ic('info')} Cómo se hace</button></div>${thumb(e.id)}</div>`;
   if(e.note)h+=`<div class="note">${esc(e.note)}</div>`;
+  const un=ultimaNota(e.id);if(un)h+=`<div class="note">La última vez: ${esc(un)}</div>`;
   if(e.items)h+=`<ol class="l">${e.items.map(it=>`<li>${esc(it.n)}</li>`).join('')}</ol>`;
   h+=`<div class="sets">${x.done.map((v,k)=>`<button class="set ${v?'on':''}" data-act="set" data-id="${e.id}" data-k="${k}">${k+1}</button>`).join('')}</div>`;
   if(num===1||e.circuit)h+=`<div class="note">${e.circuit?'Tocá cada ronda al terminarla: arranca la pausa.':'Tocá la serie al terminarla: arranca la pausa.'}</div>`;
@@ -774,6 +809,7 @@ function renderWork(){
   if(e.kg)h+=kgBlock(e.id,x);
   if(e.items)for(const it of e.items)if(it.id&&d.ex[it.id])h+=`<div class="sub"><div class="k">${esc(it.n)}</div>${kgBlock(it.id,d.ex[it.id])}</div>`;
   if(e.meas)h+=`<div class="row" style="margin-top:8px"><label class="kg"><input type="number" inputmode="decimal" data-val="${e.id}" value="${esc(x.val)}" placeholder="${e.meas}"> ${e.meas==='seg'?'seg (mejor)':'min total'}</label></div>`;
+  h+=x.nota||x.notaOpen?`<textarea style="margin-top:10px" data-nota="${e.id}" placeholder="Qué pasó, con qué lo cambiaste, cómo te sentiste...">${esc(x.nota||'')}</textarea>`:`<div><button class="howl" data-act="notaopen" data-id="${e.id}">✎ Anotar algo</button></div>`;
   h+='</div>'}
  h+=`<button class="btn okb" data-act="finish">${ic('check')} Terminar sesión</button><button class="btn link" data-act="discard">Descartar sesión</button>`;
  return h}
@@ -781,11 +817,18 @@ function finishWorkout(){
  const d=S.draft;if(!d)return;
  const L={type:d.type,status:'done',mode:d.mode,dur:Math.max(1,Math.round((Date.now()-d.t0)/60000)),bw:S.block.week,cycle:S.block.cycle,ex:{}};
  const upd=S.block.week!==4&&!d.mode.light;
- for(const id in d.ex){const x=d.ex[id];
-  L.ex[id]={kg:x.kg,feel:x.feel,val:x.val,sets:x.done?x.done.filter(Boolean).length:null,of:x.done?x.done.length:null};
-  if(upd&&x.kg!==''&&x.kg!=null)S.weights[id]={kg:+x.kg,feel:x.feel||'justo',date:d.date}}
+ for(const id in d.ex){const x=d.ex[id];if(x.why==='hecho'&&x.done)x.done=x.done.map(()=>true)}
+ for(const id in d.ex){const x=d.ex[id],e=SES[d.type].ex.find(e=>e.id===id),padre=e?null:SES[d.type].ex.find(e=>e.items&&e.items.some(it=>it.id===id));
+  const sets=x.done?x.done.filter(Boolean).length:null,of=x.done?x.done.length:null;
+  // Sólo cuenta el peso de lo que se hizo: con 0 series y sin sensación, el sugerido no se guarda. En el circuito manda la cantidad de rondas.
+  const hecho=padre?d.ex[padre.id].done.some(Boolean):sets>0||!!x.feel;
+  let kg=x.kg;if(!hecho)kg='';else if(e&&e.lastre&&(kg===''||kg==null))kg=0;
+  L.ex[id]={kg,feel:x.feel,val:x.val,sets,of};
+  if(x.why)L.ex[id].why=x.why;
+  if(x.nota&&x.nota.trim())L.ex[id].nota=x.nota.trim();
+  if(upd&&kg!==''&&kg!=null)S.weights[id]={kg:+kg,feel:x.feel||(x.done&&sets<of?'parcial':'justo'),date:d.date}}
  if(L.dur>300)L.dur=null;
- S.log[d.date]=L;S.draft=null;save();stopTimer();keepAwake(false);view='hoy';render();scrollTo(0,0);toast('Sesión guardada 💪')}
+ S.log[d.date]=L;S.draft=null;save();stopTimer();keepAwake(false);view='hoy';sheet('');render();scrollTo(0,0);toast('Sesión guardada 💪')}
 
 /* ============ Timer ============ */
 let T=null,TI=null,AC=null;
@@ -851,7 +894,10 @@ function renderProgreso(){
  const ids=Object.keys(hist);
  if(!ids.length)h+='<div class="mut">Todavía no hay sesiones guardadas con cargas.</div>';
  else{h+='<table>';for(const id of ids){const a=hist[id].slice(-5);h+=`<tr><td>${esc(EXNAME[id]||id)}</td><td>${a.map(x=>`<span title="${x.d}">${esc(x.v)}</span>`).join(' → ')}</td></tr>`}h+='</table>'}
- h+='</div><h2>Moto</h2><div class="card">';
+ h+='</div>';
+ const nts=[];for(const d of dates.slice().reverse()){const ex=S.log[d].ex;if(ex)for(const id in ex){const t=notaTxt(ex[id]);if(t)nts.push(`<tr><td>${fmtD(d)}</td><td><b>${esc(EXNAME[id]||id)}</b><br>${esc(t)}</td></tr>`)}}
+ if(nts.length)h+=`<h2>Notas de los ejercicios</h2><div class="card"><table>${nts.slice(0,12).join('')}</table></div>`;
+ h+='<h2>Moto</h2><div class="card">';
  const motos=[...new Set([...Object.keys(S.moto),...dates.filter(d=>S.log[d].type==='MOTO')])].sort().reverse().slice(0,10);
  if(!motos.length)h+='<div class="mut">Sin salidas registradas.</div>';
  else h+=`<table><tr><th>Fecha</th><th>Horas</th><th>Arm pump</th><th>Lo más cargado</th></tr>${motos.map(d=>{const m=motoAt(d)||{},top=ZONAS.map(z=>z[0]).filter(k=>k!=='pump'&&z5(m,k)>=3).sort((a,b)=>z5(m,b)-z5(m,a));return `<tr><td>${fmtD(d)}</td><td>${esc(m.horas)}</td><td>${z5(m,'pump')?z5(m,'pump')+'/5':'–'}</td><td>${top.length?top.map(k=>ZN(k)+' '+z5(m,k)).join(' · '):ZONAS.some(([k])=>k!=='pump'&&z5(m,k))?'Todo bien':'–'}</td></tr>${m.notas?`<tr><td colspan="4" class="note">${esc(m.notas)}</td></tr>`:''}`}).join('')}</table>`;
@@ -926,7 +972,11 @@ document.addEventListener('click',e=>{
  case 'work':{const ex=SES[S.draft.type].ex.find(q=>q.id===id);
   startTimer(ex.secs,'Trabajo · '+ex.n,'work',()=>{const x=S.draft&&S.draft.ex[id];if(x){const k=x.done.indexOf(false);if(k>=0)x.done[k]=true;save();render()}if(ex.rest)startTimer(ex.rest,'Pausa · '+ex.n,'rest')});break}
  case 'feel':{const x=S.draft.ex[id];x.feel=x.feel===v?null:v;save();render();break}
- case 'finish':finishWorkout();break;
+ case 'finish':if(S.draft&&faltan(S.draft).length)faltanSheet();else finishWorkout();break;
+ case 'finishok':finishWorkout();break;
+ case 'motivo':{const x=S.draft.ex[id];x.why=x.why===v?null:v;save();faltanSheet();break}
+ case 'motivotodos':for(const e of faltan(S.draft)){const x=S.draft.ex[e.id];if(!x.why)x.why=v}save();faltanSheet();break;
+ case 'notaopen':{S.draft.ex[id].notaOpen=true;render();const n=$(`textarea[data-nota="${id}"]`);if(n)n.focus();break}
  case 'tadd':if(T){T.end+=(+v)*1000;T.tot=Math.max(1,T.tot+(+v));T.fired=false;tick()}break;
  case 'tstop':stopTimer();break;
  case 'nopuedo':replanDo(()=>{S.unav[d]=true});break;
@@ -970,6 +1020,7 @@ document.addEventListener('input',e=>{
  const t=e.target;if(!S.draft)return;
  if(t.dataset.kg&&S.draft.ex[t.dataset.kg]){S.draft.ex[t.dataset.kg].kg=t.value;save()}
  if(t.dataset.val&&S.draft.ex[t.dataset.val]){S.draft.ex[t.dataset.val].val=t.value;save()}
+ if(t.dataset.nota&&S.draft.ex[t.dataset.nota]){S.draft.ex[t.dataset.nota].nota=t.value;save()}
 });
 document.addEventListener('change',e=>{
  if(e.target.id!=='imp'||!e.target.files[0])return;
