@@ -383,8 +383,52 @@ const DROPTIP={A:'En la próxima sesión sumá al principio 3x5 de sentadilla a 
 const BLOCK={1:'Cargas base (RPE 7-8)',2:'+2,5 a 5 kg o +1 rep',3:'+2,5 a 5 kg o +1 rep (RPE 8-9)',4:'Descarga: -40% de volumen, misma técnica'};
 const PRE_MOTO=['3-5 min de soga, trote o saltos hasta empezar a transpirar','Abrir y cerrar manos, extensores con banda, rotaciones de muñeca','Círculos de hombro, band pull-aparts','10 sentadillas y 10 bisagras de cadera'];
 const SETUP=['Altura del manubrio y risers (si duele la espalda alta, suele ser manubrio bajo o adelantado)','Ángulo de manetas: parado, la muñeca recta','Recorrido del embrague: sin estirar los dedos de más','Puños: ni muy gruesos ni muy finos','Embrague liviano: cable lubricado o hidráulico bien purgado (cada tirón suma)','Suspensión de adelante: si está dura y golpea, te obliga a apretar (probá 1-2 clicks más blanda en compresión)'];
+// Parecidos para cuando la máquina está ocupada. kg/inc/secs/meas como en SES; r = reps si cambian. El peso de cada uno se guarda aparte del original.
+const ALT={
+ a1:[{id:'a1x1',n:'Sentadilla goblet',r:'8',kg:1,inc:2,h:'Mancuerna pegada al pecho. Bajá hasta que los codos rocen las rodillas, con la espalda derecha.'},
+  {id:'a1x2',n:'Prensa de piernas',r:'8',kg:1,inc:5,h:'Pies al ancho de hombros. Bajá hasta unos 90° sin despegar la cola del respaldo.'},
+  {id:'a1x3',n:'Sentadilla con mancuernas',r:'8',kg:1,inc:2,h:'Una mancuerna a cada lado, brazos colgando. Misma bajada que con barra. kg por mancuerna.'}],
+ a2:[{id:'a2x1',n:'Peso muerto rumano con mancuernas',kg:1,inc:2,h:'Igual que con barra: rodillas apenas flexionadas, cadera atrás, mancuernas pegadas a las piernas. kg por mancuerna.'},
+  {id:'a2x2',n:'Curl femoral en máquina',r:'10',kg:1,inc:2.5,h:'Subí con fuerza y bajá lento, en 3 segundos.'},
+  {id:'a2x3',n:'Puente de glúteo con mancuerna',r:'12',kg:1,inc:2,h:'Espalda alta en un banco, mancuerna sobre la cadera. Subí y apretá 1 segundo arriba.'}],
+ a3:[{id:'a3x1',n:'Zancada hacia atrás',kg:1,inc:2,h:'Con mancuernas. Paso largo atrás, bajá la rodilla casi al piso y volvé con la pierna de adelante.'},
+  {id:'a3x2',n:'Subida al cajón',kg:1,inc:2,h:'Con mancuernas, en un cajón a la altura de la rodilla. Subí empujando con la pierna de arriba, sin impulso.'}],
+ a7:[{id:'a7x1',n:'Curl femoral lento en máquina',r:'8',kg:1,inc:2.5,h:'Lo importante es la bajada: tardá 4 segundos.'},
+  {id:'a7x2',n:'Puente de isquios a una pierna',r:'8 por pierna',h:'Acostado, talón sobre un banco y la otra pierna arriba. Subí la cadera empujando con el talón.'}],
+ a4:[{id:'a4x1',n:'Isométrico en pedalines con mancuernas',kg:1,inc:2,secs:50,h:'Posición de ataque: rodillas flexionadas, cadera atrás, pecho adelante, una mancuerna en cada mano. kg por mancuerna.'},
+  {id:'a4x2',n:'Sentadilla isométrica contra la pared',secs:50,h:'Espalda contra la pared y rodillas a unos 90°. No aprieta el agarre: sirve si hay moto cerca.'}],
+ a5:[{id:'a5x1',n:'Suitcase en el lugar',r:'40" por lado',kg:1,inc:2,secs:40,h:'Una mancuerna de un solo lado. Marchá en el lugar sin inclinarte para ningún costado.'},
+  {id:'a5x2',n:'Plancha lateral',r:'30" por lado',secs:30,h:'Apoyado en el antebrazo, cuerpo en línea recta y cadera arriba.'}],
+ a6:[{id:'a6x1',n:'Pallof con banda',h:'Banda atada a la altura del pecho. Estirá los brazos adelante sin dejar que el cuerpo gire.'},
+  {id:'a6x2',n:'Plancha con toque de hombro',r:'10 por lado',h:'En plancha alta, tocate el hombro contrario sin mover la cadera.'}],
+ a8:[{id:'a8x1',n:'Superman quieto',r:'30"',secs:30,h:'Boca abajo, levantá apenas pecho y piernas y aguantá.'},
+  {id:'a8x2',n:'Bird-dog quieto',r:'20" por lado',secs:20,h:'En cuatro apoyos, brazo y pierna contrarios estirados. Espalda quieta.'}],
+ b1:[{id:'b1x1',n:'Jalón al pecho en polea',r:'8',kg:1,inc:2.5,h:'Barra al pecho, sacando pecho y bajando los hombros. Volvé despacio.'},
+  {id:'b1x2',n:'Remo invertido',r:'8-10',h:'Colgado de una barra baja o TRX, cuerpo recto. Llevá el pecho a la barra.'}],
+ b2:[{id:'b2x1',n:'Remo en polea baja',kg:1,inc:2.5,h:'Sentado, espalda quieta. Llevá el agarre al ombligo y apretá las escápulas 1 segundo.'},
+  {id:'b2x2',n:'Remo con mancuerna a una mano',r:'10 por lado',kg:1,inc:2,h:'Mano y rodilla apoyadas en un banco. Llevá el codo hacia atrás, sin girar el cuerpo.'}],
+ b3:[{id:'b3x1',n:'Press de hombro en máquina',kg:1,inc:2.5,h:'Agarres a la altura del hombro. Subí sin trabar los codos y bajá despacio.'},
+  {id:'b3x2',n:'Flexiones pike',h:'Cola arriba, cuerpo en V invertida. Bajá la cabeza hacia el piso doblando los codos.'}],
+ b4:[{id:'b4x1',n:'Pájaros con mancuernas',kg:1,inc:1,h:'Inclinado adelante con la espalda recta. Abrí los brazos hacia los costados y apretá las escápulas.'},
+  {id:'b4x2',n:'Face pull con banda',h:'Banda a la altura de la cara. Tirá hacia la frente con los codos altos.'}],
+ b5:[{id:'b5x1',n:'Rotación externa con banda',h:'Codo pegado al cuerpo a 90°. Abrí la mano hacia afuera, sin despegar el codo.'},
+  {id:'b5x2',n:'Rotación externa acostado',kg:1,inc:1,h:'Acostado de lado, codo pegado a las costillas, mancuerna liviana. Subila girando el brazo.'}],
+ b7:[{id:'b7x1',n:'Aguante con mancuernas pesadas',r:'máx',kg:1,inc:2,meas:'seg',h:'Parado y quieto, una mancuerna pesada en cada mano. Aguantá hasta casi soltar. Anotá tu mejor tiempo.'},
+  {id:'b7x2',n:'Pinza con discos',r:'máx',kg:1,inc:1,meas:'seg',h:'Agarrá uno o dos discos juntos con los dedos, sin cerrar la mano. Anotá tu mejor tiempo.'}],
+ b8:[{id:'b8x1',n:'Curl de muñeca inverso con mancuerna',r:'15',kg:1,inc:1,h:'Antebrazo apoyado y palma hacia abajo. Subí y bajá sólo la mano, como acelerando.'},
+  {id:'b8x2',n:'Curl de muñeca inverso con barra',r:'15',kg:1,inc:1,h:'Sentado, antebrazos sobre las rodillas y palmas hacia abajo. Subí y bajá sólo las manos.'}],
+ b9:[{id:'b9x1',n:'Abrir los dedos con un elástico',h:'Un elástico alrededor de los dedos. Abrí la mano del todo y cerrá despacio.'},
+  {id:'b9x2',n:'Abrir los dedos contra la otra mano',h:'Sin nada: la otra mano frena los dedos mientras los abrís.'}],
+ c1:[{id:'c1x1',n:'Press con mancuernas en banco',kg:1,inc:2,h:'Bajá hasta la altura del pecho y subí sin trabar los codos. kg por mancuerna.'},
+  {id:'c1x2',n:'Press de pecho en máquina',r:'8',kg:1,inc:2.5,h:'Agarres a la altura del pecho. Empujá y volvé despacio.'},
+  {id:'c1x3',n:'Flexiones con pies en alto',r:'10',h:'Pies sobre un banco y cuerpo recto. Bajá el pecho casi al piso.'}],
+ c2:[{id:'c2x1',n:'Remo en polea baja',r:'10',kg:1,inc:2.5,h:'Sentado, espalda quieta. Llevá el agarre al ombligo.'},
+  {id:'c2x2',n:'Remo con barra',r:'10',kg:1,inc:2.5,h:'Inclinado adelante con la espalda recta. Llevá la barra al ombligo.'}]
+};
+const altOf=(id,aid)=>aid&&ALT[id]?ALT[id].find(a=>a.id===aid):null;
 const EXNAME={};
 for(const k of GYM)for(const e of SES[k].ex){EXNAME[e.id]=e.n;if(e.items)for(const it of e.items)if(it.id)EXNAME[it.id]=it.n.replace(/ x\d+| \d+ m/,'')}
+for(const id in ALT)for(const a of ALT[id])EXNAME[a.id]=a.n;
 
 /* ============ Estado ============ */
 const KEY='enduroGym.v1';
@@ -418,7 +462,7 @@ function repairData(){
  const ds=Object.keys(S.log).sort();
  for(const id in S.weights){const w=S.weights[id],x=S.log[w.date]&&S.log[w.date].ex&&S.log[w.date].ex[id];
   if(!x||x.sets!==0||x.feel)continue;
-  const f=ds.filter(d=>d<w.date).reverse().find(d=>{const L=S.log[d],y=L.ex&&L.ex[id];return y&&y.sets>0&&y.kg!==''&&y.kg!=null&&L.bw!==4&&!(L.mode&&L.mode.light)});
+  const f=ds.filter(d=>d<w.date).reverse().find(d=>{const L=S.log[d],y=L.ex&&L.ex[id];return y&&!y.alt&&y.sets>0&&y.kg!==''&&y.kg!=null&&L.bw!==4&&!(L.mode&&L.mode.light)});
   if(f){const y=S.log[f].ex[id];S.weights[id]={kg:+y.kg,feel:y.feel||'justo',date:f}}else delete S.weights[id]}
  for(const d of ds){const ex=S.log[d].ex;if(ex)for(const id in ex)if(ex[id].sets===0&&!ex[id].feel)ex[id].kg=''}}
 function processWeeks(){
@@ -573,7 +617,7 @@ const why=p=>{const x=whyTxt(p);return x?`<div class="why">${ic('info')}<span>${
 function lastGymDay(){const t=todayStr();for(let i=0;i<=60;i++){const L=S.log[addDays(t,-i)];if(L&&L.status==='done'&&GYM.includes(L.type))return i}return null}
 function streak(){const mon=mondayOf(todayStr());let n=0;for(let w=1;w<=52&&gymCount(addDays(mon,-7*w))>=2;w++)n++;return n}
 function kgTrend(){const first={},last={};
- for(const d of Object.keys(S.log).sort()){const ex=S.log[d].ex;if(!ex)continue;for(const id in ex){const k=+ex[id].kg;if(!k)continue;if(first[id]==null)first[id]=k;last[id]=k}}
+ for(const d of Object.keys(S.log).sort()){const ex=S.log[d].ex;if(!ex)continue;for(const i in ex){const k=+ex[i].kg,id=ex[i].alt||i;if(!k)continue;if(first[id]==null)first[id]=k;last[id]=k}}
  return{up:Object.keys(first).filter(id=>last[id]>first[id]).sort((a,b)=>last[b]/first[b]-last[a]/first[a]),first,last}}
 function pumpTrend(){const ds=[...new Set([...Object.keys(S.moto),...Object.keys(S.log).filter(d=>S.log[d].type==='MOTO')])].sort();return ds.map(d=>z5(motoAt(d)||{},'pump')).filter(Boolean).slice(-4)}
 // El mismo motivo repetido en las últimas 3 veces de un ejercicio.
@@ -772,15 +816,25 @@ function startWorkout(type,mode){
 const MOTIVOS=[['hecho','Lo hice, no lo marqué'],['tiempo','Sin tiempo'],['cansado','Cansado'],['dolor','Molestia o dolor'],['equipo','No hay equipo'],['cambio','Hice otro en su lugar'],['nogusta','No me sale o no me gusta'],['otro','Otra cosa']];
 const MOTIVOPH={dolor:'¿Dónde te molestó?',equipo:'¿Qué faltó?',cambio:'¿Cuál hiciste?',nogusta:'¿Qué no sale?'};
 function motivoName(k){const m=MOTIVOS.find(m=>m[0]===k);return m?m[1]:k}
-function notaTxt(x){return[x.why&&x.why!=='hecho'?motivoName(x.why):'',x.nota||''].filter(Boolean).join(' · ')}
+function notaTxt(x){return[x.alt?'Hiciste '+(EXNAME[x.alt]||x.alt):'',x.why&&x.why!=='hecho'?motivoName(x.why):'',x.nota||''].filter(Boolean).join(' · ')}
 function ultimaNota(id){for(const f of Object.keys(S.log).sort().reverse()){const L=S.log[f],x=L.ex&&L.ex[id];if(x)return notaTxt(x)}return''}
 function faltan(d){return visibleEx(d.type,d.mode).filter(e=>d.ex[e.id]&&d.ex[e.id].done&&!d.ex[e.id].done.every(Boolean))}
+function altSheet(id){
+ const d=S.draft,e=SES[d.type].ex.find(q=>q.id===id),x=d.ex[id];
+ let h=`<h1>Si está ocupado</h1><div class="mut">En lugar de ${esc(e.n)}. Trabajan parecido y se hacen las mismas series. Las que ya marcaste quedan.</div>`;
+ for(const a of ALT[id])h+=`<div class="sub"><div class="t">${esc(a.n)}</div><div class="mut">${esc(a.r||e.r)}</div><div class="note">${esc(a.h)}</div>${x.alt===a.id?'<div class="k" style="margin-top:8px">Es el que estás haciendo</div>':`<button class="btn sm" data-act="altpick" data-id="${id}" data-v="${a.id}">Hacer este</button>`}</div>`;
+ sheet(h+`<div style="height:12px"></div>${x.alt?`<button class="btn" data-act="altpick" data-id="${id}" data-v="">Volver a ${esc(e.n)}</button>`:''}<button class="btn ghost" data-act="closesheet">Cancelar</button>`)}
+function pickAlt(id,aid){
+ const d=S.draft,e=SES[d.type].ex.find(q=>q.id===id),x=d.ex[id],a=altOf(id,aid);
+ const t=a||e,sg=t.kg?suggestKg(a?a.id:id,t.inc,d.mode):null;
+ if(a)x.alt=a.id;else delete x.alt;
+ x.kg=sg?sg.kg:'';x.sug=sg;x.feel=null;x.val='';save();sheet('');render()}
 function faltanSheet(){
  const d=S.draft,o=$('.sheet'),sc=o?o.scrollTop:0;
  let h=`<h1>¿Qué pasó con estos?</h1><div class="mut">Te quedaron sin terminar. Elegí un motivo: sirve para ir ajustando la rutina. Si no querés, dejalo vacío.</div>
  <div class="q"><div class="k">Para todos los que no marques</div><div class="chips"><button class="chip" data-act="motivotodos" data-v="tiempo">Sin tiempo</button><button class="chip" data-act="motivotodos" data-v="cansado">Cansado</button></div></div>`;
  for(const e of faltan(d)){const x=d.ex[e.id],n=x.done.filter(Boolean).length;
-  h+=`<div class="sub"><div class="t">${esc(e.n)}</div><div class="mut">${n} de ${x.done.length} ${e.circuit?'rondas':'series'}</div><div class="chips">${MOTIVOS.map(([k,l])=>`<button class="chip ${x.why===k?'on':''}" data-act="motivo" data-id="${e.id}" data-v="${k}">${l}</button>`).join('')}</div>`;
+  h+=`<div class="sub"><div class="t">${esc(x.alt?EXNAME[x.alt]:e.n)}</div><div class="mut">${n} de ${x.done.length} ${e.circuit?'rondas':'series'}</div><div class="chips">${MOTIVOS.map(([k,l])=>`<button class="chip ${x.why===k?'on':''}" data-act="motivo" data-id="${e.id}" data-v="${k}">${l}</button>`).join('')}</div>`;
   if((x.why&&x.why!=='hecho')||x.nota)h+=`<input type="text" style="width:100%;margin-top:8px;font-size:15px;font-weight:400" data-nota="${e.id}" value="${esc(x.nota||'')}" placeholder="${MOTIVOPH[x.why]||'¿Qué pasó? (opcional)'}">`;
   h+='</div>'}
  sheet(h+`<div style="height:12px"></div><button class="btn okb" data-act="finishok">${ic('check')} Guardar y terminar</button><button class="btn ghost" data-act="closesheet">Seguir entrenando</button>`);
@@ -796,19 +850,20 @@ function renderWork(){
  h+=`<div class="card"><div class="k">Calentamiento (10')</div><div class="mut">${s.warm}</div></div>`;
  let grp='',num=0;
  for(const e of vis){
-  const x=d.ex[e.id];num++;
+  const x=d.ex[e.id],a=altOf(e.id,x.alt);num++;
   if(e.grp&&e.grp!==grp){grp=e.grp;h+=`<h2>${esc(grp)}</h2>`}
   const all=x.done.every(Boolean);
-  h+=`<div class="ex ${all?'alldone':''}"><div class="exh"><span class="n">${all?ic('check'):String(num).padStart(2,'0')}</span><div><div class="t">${esc(e.n)}</div>${e.grip&&motoEn2(d.date)?'<span class="tag warn">Agarre liviano</span>':''}<div><span class="sr">${x.done.length} × ${esc(e.r)}</span> <span class="mut">· pausa ${e.rest?(e.rest>=60?(e.rest/60)+"'":e.rest+'"'):'–'}</span></div><button class="howl" data-act="how" data-id="${e.id}">${ic('info')} Cómo se hace</button></div>${thumb(e.id)}</div>`;
-  if(e.note)h+=`<div class="note">${esc(e.note)}</div>`;
+  h+=`<div class="ex ${all?'alldone':''}"><div class="exh"><span class="n">${all?ic('check'):String(num).padStart(2,'0')}</span><div><div class="t">${esc(a?a.n:e.n)}</div>${a?`<div class="mut">En lugar de ${esc(e.n)}</div>`:''}${e.grip&&motoEn2(d.date)?'<span class="tag warn">Agarre liviano</span>':''}<div><span class="sr">${x.done.length} × ${esc(a&&a.r||e.r)}</span> <span class="mut">· pausa ${e.rest?(e.rest>=60?(e.rest/60)+"'":e.rest+'"'):'–'}</span></div>${a?`<div class="note">${esc(a.h)}</div>`:`<button class="howl" data-act="how" data-id="${e.id}">${ic('info')} Cómo se hace</button>`}${ALT[e.id]?`<div><button class="howl" data-act="alt" data-id="${e.id}">⇄ ${a?'Cambiar o volver':'Ocupado: hacer otro'}</button></div>`:''}</div>${a?'':thumb(e.id)}</div>`;
+  if(e.note&&!a)h+=`<div class="note">${esc(e.note)}</div>`;
   const un=ultimaNota(e.id);if(un)h+=`<div class="note">La última vez: ${esc(un)}</div>`;
   if(e.items)h+=`<ol class="l">${e.items.map(it=>`<li>${esc(it.n)}</li>`).join('')}</ol>`;
   h+=`<div class="sets">${x.done.map((v,k)=>`<button class="set ${v?'on':''}" data-act="set" data-id="${e.id}" data-k="${k}">${k+1}</button>`).join('')}</div>`;
   if(num===1||e.circuit)h+=`<div class="note">${e.circuit?'Tocá cada ronda al terminarla: arranca la pausa.':'Tocá la serie al terminarla: arranca la pausa.'}</div>`;
-  if(e.secs)h+=`<button class="btn sm ghost" data-act="work" data-id="${e.id}">${ic('play')} Cronómetro ${e.secs}"</button>`;
-  if(e.kg)h+=kgBlock(e.id,x);
+  const secs=a?a.secs:e.secs;
+  if(secs)h+=`<button class="btn sm ghost" data-act="work" data-id="${e.id}">${ic('play')} Cronómetro ${secs}"</button>`;
+  if(a?a.kg:e.kg)h+=kgBlock(e.id,x);
   if(e.items)for(const it of e.items)if(it.id&&d.ex[it.id])h+=`<div class="sub"><div class="k">${esc(it.n)}</div>${kgBlock(it.id,d.ex[it.id])}</div>`;
-  if(e.meas)h+=`<div class="row" style="margin-top:8px"><label class="kg"><input type="number" inputmode="decimal" data-val="${e.id}" value="${esc(x.val)}" placeholder="${e.meas}"> ${e.meas==='seg'?'seg (mejor)':'min total'}</label></div>`;
+  if(a?a.meas:e.meas)h+=`<div class="row" style="margin-top:8px"><label class="kg"><input type="number" inputmode="decimal" data-val="${e.id}" value="${esc(x.val)}" placeholder="${e.meas}"> ${e.meas==='seg'?'seg (mejor)':'min total'}</label></div>`;
   h+=x.nota||x.notaOpen?`<textarea style="margin-top:10px" data-nota="${e.id}" placeholder="Qué pasó, con qué lo cambiaste, cómo te sentiste...">${esc(x.nota||'')}</textarea>`:`<div><button class="howl" data-act="notaopen" data-id="${e.id}">✎ Anotar algo</button></div>`;
   h+='</div>'}
  h+=`<button class="btn okb" data-act="finish">${ic('check')} Terminar sesión</button><button class="btn link" data-act="discard">Descartar sesión</button>`;
@@ -822,11 +877,12 @@ function finishWorkout(){
   const sets=x.done?x.done.filter(Boolean).length:null,of=x.done?x.done.length:null;
   // Sólo cuenta el peso de lo que se hizo: con 0 series y sin sensación, el sugerido no se guarda. En el circuito manda la cantidad de rondas.
   const hecho=padre?d.ex[padre.id].done.some(Boolean):sets>0||!!x.feel;
-  let kg=x.kg;if(!hecho)kg='';else if(e&&e.lastre&&(kg===''||kg==null))kg=0;
+  let kg=x.kg;if(!hecho)kg='';else if(e&&e.lastre&&!x.alt&&(kg===''||kg==null))kg=0;
   L.ex[id]={kg,feel:x.feel,val:x.val,sets,of};
+  if(x.alt)L.ex[id].alt=x.alt;
   if(x.why)L.ex[id].why=x.why;
   if(x.nota&&x.nota.trim())L.ex[id].nota=x.nota.trim();
-  if(upd&&kg!==''&&kg!=null)S.weights[id]={kg:+kg,feel:x.feel||(x.done&&sets<of?'parcial':'justo'),date:d.date}}
+  if(upd&&kg!==''&&kg!=null)S.weights[x.alt||id]={kg:+kg,feel:x.feel||(x.done&&sets<of?'parcial':'justo'),date:d.date}}
  if(L.dur>300)L.dur=null;
  S.log[d.date]=L;S.draft=null;save();stopTimer();keepAwake(false);view='hoy';sheet('');render();scrollTo(0,0);toast('Sesión guardada 💪')}
 
@@ -889,7 +945,7 @@ function renderProgreso(){
  h+='</div><div style="height:18px"></div><div class="note">Cada barra es una semana (máx 3). Las oscuras tuvieron menos de 2 sesiones.</div></div>';
  const dates=Object.keys(S.log).sort();
  const hist={};
- for(const d of dates){const L=S.log[d];if(!L.ex)continue;for(const id in L.ex){const x=L.ex[id];const v=x.kg!==''&&x.kg!=null?x.kg+' kg':x.val?x.val+(id==='b7'?' s':' min'):null;if(v){(hist[id]=hist[id]||[]).push({d,v,f:x.feel})}}}
+ for(const d of dates){const L=S.log[d];if(!L.ex)continue;for(const id in L.ex){const x=L.ex[id];const v=x.kg!==''&&x.kg!=null?x.kg+' kg':x.val?x.val+(id==='b7'?' s':' min'):null;if(v){const hk=x.alt||id;(hist[hk]=hist[hk]||[]).push({d,v,f:x.feel})}}}
  h+='<h2>Cargas (últimas 5)</h2><div class="card">';
  const ids=Object.keys(hist);
  if(!ids.length)h+='<div class="mut">Todavía no hay sesiones guardadas con cargas.</div>';
@@ -969,11 +1025,13 @@ document.addEventListener('click',e=>{
  case 'set':{const x=S.draft.ex[id],k=+el.dataset.k;x.done[k]=!x.done[k];save();
   if(x.done[k]){const ex=SES[S.draft.type].ex.find(q=>q.id===id);if(ex.rest)startTimer(ex.rest,'Pausa · '+ex.n,'rest')}
   render();break}
- case 'work':{const ex=SES[S.draft.type].ex.find(q=>q.id===id);
+ case 'work':{const ex0=SES[S.draft.type].ex.find(q=>q.id===id),a=altOf(id,S.draft.ex[id].alt),ex=a?{...ex0,n:a.n,secs:a.secs}:ex0;
   startTimer(ex.secs,'Trabajo · '+ex.n,'work',()=>{const x=S.draft&&S.draft.ex[id];if(x){const k=x.done.indexOf(false);if(k>=0)x.done[k]=true;save();render()}if(ex.rest)startTimer(ex.rest,'Pausa · '+ex.n,'rest')});break}
  case 'feel':{const x=S.draft.ex[id];x.feel=x.feel===v?null:v;save();render();break}
  case 'finish':if(S.draft&&faltan(S.draft).length)faltanSheet();else finishWorkout();break;
  case 'finishok':finishWorkout();break;
+ case 'alt':altSheet(id);break;
+ case 'altpick':pickAlt(id,v);break;
  case 'motivo':{const x=S.draft.ex[id];x.why=x.why===v?null:v;save();faltanSheet();break}
  case 'motivotodos':for(const e of faltan(S.draft)){const x=S.draft.ex[e.id];if(!x.why)x.why=v}save();faltanSheet();break;
  case 'notaopen':{S.draft.ex[id].notaOpen=true;render();const n=$(`textarea[data-nota="${id}"]`);if(n)n.focus();break}
