@@ -8,7 +8,7 @@
 ## Datos reales de Erick
 La app sube `historial.json` al repo privado `erickiess/rutina-enduro-datos`. Para leerlo:
 `git -C datos pull` (clon en `datos/`, ignorado por git). Si no existe: `git clone https://github.com/erickiess/rutina-enduro-datos datos`.
-Claves útiles: `log[fecha]` (type A/B/C/OTRO/REST/MOTO, status, ex con kg, sets/of, why = motivo si quedó sin terminar, nota = texto libre; OTRO: stretch, cans 1-5, nota), `bici[fecha]`, `moto[fecha]` (zonas 1-5), `block`. Mirar `why` y `nota` para saber por qué no se hizo un ejercicio: `hecho` = lo hizo y no lo marcó, `equipo` = no hay equipo, `cambio` = hizo otro (cuál, en la nota). `ex[id].alt` = hizo ese parecido de `ALT` (los kg son de ese parecido, y su peso va en `weights[alt]`).
+Claves útiles: `log[fecha]` (type A/B/C/OTRO/REST/MOTO, status, ex con kg, sets/of, why = motivo si quedó sin terminar, nota = texto libre; OTRO: stretch, cans 1-5, nota), `bici[fecha]`, `moto[fecha]` (horas, notas, zonas 1-5; opcionales desde v23: `pumpMin` minutos hasta cargarse el antebrazo, `paro` no/una/varias, `dureza` tranquila/normal/dura, `llegue` 1-5 con 5 = descansado; vacío = sin dato), `block`. Mirar `why` y `nota` para saber por qué no se hizo un ejercicio: `hecho` = lo hizo y no lo marcó, `equipo` = no hay equipo, `cambio` = hizo otro (cuál, en la nota). `ex[id].alt` = hizo ese parecido de `ALT` (los kg son de ese parecido, y su peso va en `weights[alt]`).
 
 Próximo trabajo: `PENDIENTES.md`.
 

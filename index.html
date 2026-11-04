@@ -706,7 +706,11 @@ function biciSheet(d,tipo){const b=S.bici[d]||{},tp=b.tipo||tipo||'Z2';
  <button class="btn" data-act="bicisave" data-d="${d}">Guardar</button>${S.bici[d]?`<button class="btn ghost" data-act="bicidel" data-d="${d}">Borrar esta salida</button>`:''}<button class="btn ghost" data-act="closesheet">Cancelar</button>`)}
 function motoSheet(d){const m=S.moto[d]||(motoAt(d)||{}),t=todayStr();
  sheet(`<h1>Moto</h1>${dayPick(d,'motoask')}
- <div class="q"><div class="k">Horas</div><input type="number" id="mh" inputmode="decimal" step="0.5" placeholder="ej. 1.5" value="${esc(m.horas)}"></div>
+ <div class="q"><div class="k" style="font-size:1.15em">⏱ Horas en la moto</div><div class="mut">Lo más importante: sin duración no se puede comparar.</div><input type="number" id="mh" inputmode="decimal" step="0.5" placeholder="ej. 1.5" value="${esc(m.horas)}" style="font-size:1.3em;padding:12px;border:2px solid var(--acc,#e67e22)"></div>
+ <div class="q"><div class="k">Minutos hasta que se cargó el antebrazo</div><input type="number" id="mpm" inputmode="numeric" placeholder="ej. 40 (vacío si no se cargó)" value="${esc(m.pumpMin)}"></div>
+ <div class="q"><div class="k">¿Tuviste que parar por cansancio o antebrazo?</div><div class="chips" id="mc-paro">${[['no','No'],['una','Una vez'],['varias','Varias']].map(([v,l])=>`<button class="chip ${m.paro===v?'on':''}" data-act="mpick" data-v="${v}">${l}</button>`).join('')}</div></div>
+ <div class="q"><div class="k">Tipo de salida</div><div class="chips" id="mc-dureza">${[['tranquila','Tranquila'],['normal','Normal'],['dura','Dura']].map(([v,l])=>`<button class="chip ${m.dureza===v?'on':''}" data-act="mpick" data-v="${v}">${l}</button>`).join('')}</div></div>
+ <div class="q"><div class="k">Cómo llegaste</div><div class="mut">Pensá en el sueño y la resaca. 1 = muy mal, 5 = descansado.</div><div class="chips" id="mc-llegue">${[1,2,3,4,5].map(v=>`<button class="chip ${+m.llegue===v?'on':''}" data-act="mpick" data-v="${v}">${v}</button>`).join('')}</div></div>
  <h2>¿Cómo quedaste?</h2>
  <div class="scalehint"><span>1 · nada</span><i></i><span>5 · al límite</span></div><div class="note" style="margin-top:2px">Más alto = más cargado o dolorido. Lo que no sientas, dejalo vacío.</div>
  ${ZONAS.map(([k,l,sub])=>`<div class="q"><div class="k">${l}</div>${sub?`<div class="mut">${sub}</div>`:''}${scale(k,z5(m,k))}</div>`).join('')}
@@ -1095,7 +1099,7 @@ document.addEventListener('click',e=>{
  case 'pre':UI.pre[v]=!UI.pre[v];render();break;
  case 'motolog':motoSheet(todayStr());break;
  case 'mpick':el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===el));break;
- case 'motosave':{const old=S.moto[d]||{},n={horas:$('#mh').value,notas:$('#mn').value,esc:5};for(const [k] of ZONAS){const c=document.querySelector('#z-'+k+' .chip.on');n[k]=c?+c.dataset.v:(z5(old,k)||'')}replanDo(()=>{S.moto[d]=n;if(S.log[d]&&S.log[d].type==='MOTO')delete S.log[d];delete S.unav[d]});break}
+ case 'motosave':{const old=S.moto[d]||{},n={horas:$('#mh').value,notas:$('#mn').value,esc:5};{const g=id=>{const c=document.querySelector('#mc-'+id+' .chip.on');return c?c.dataset.v:(old[id]||'')};n.pumpMin=$('#mpm').value;n.paro=g('paro');n.dureza=g('dureza');n.llegue=g('llegue')?+g('llegue'):''}for(const [k] of ZONAS){const c=document.querySelector('#z-'+k+' .chip.on');n[k]=c?+c.dataset.v:(z5(old,k)||'')}replanDo(()=>{S.moto[d]=n;if(S.log[d]&&S.log[d].type==='MOTO')delete S.log[d];delete S.unav[d]});break}
  case 'setweek':S.block.week=+v;save();render();break;
  case 'retorno':S.retorno=!S.retorno;save();render();break;
  case 'setup':S.setup[v]=!S.setup[v];save();render();break;

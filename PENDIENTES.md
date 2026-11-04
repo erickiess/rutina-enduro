@@ -11,13 +11,13 @@ Reglas para todas las etapas:
 - Subir la versión de `sw.js`, probar en el preview `enduro-gym` y actualizar `RESUMEN.md` y el mapa.
 - Este repo es público: no escribir acá datos personales ni resultados de Erick.
 
-## Etapa 1: medir el aguante (Sonnet) — SIGUE ESTA
+## Etapa 1: medir el aguante (Sonnet) — HECHA (v23, 04/11/2026)
 
 Hoy la moto se anota con molestias de 1 a 5, pero no cuánto se aguantó, que es el objetivo.
 
 Prompt: "Seguí la etapa 1 de PENDIENTES.md. En `motoSheet` sumá, todos opcionales y sin romper las salidas viejas: minutos hasta que se cargó el antebrazo (`pumpMin`), si tuvo que parar por cansancio o por el antebrazo (`paro`: no, una vez, varias), tipo de salida (`dureza`: tranquila, normal, dura) y cómo llegó (`llegue`, de 1 a 5, con sueño y resaca en mente). Hacé que Horas se note más, porque sin duración no se puede comparar. Documentá las claves nuevas en CLAUDE.md."
 
-## Etapa 2: pantalla "Qué te sirve" (Opus para el diseño de las reglas, Sonnet para implementar)
+## Etapa 2: pantalla "Qué te sirve" (Opus para el diseño de las reglas, Sonnet para implementar) — SIGUE ESTA
 
 Prompt: "Seguí la etapa 2 de PENDIENTES.md. En Progreso agregá 'Qué te sirve', en una sección nueva con separador. Por ejercicio: % de series hechas en las últimas 4 semanas, tendencia de carga y etiqueta (viene bien, estancado, casi nunca lo hacés, siempre 'No llegué'), con los motivos anotados. Por salida de moto: aguante y molestias contra lo hecho en los 7 días previos (minutos de bici, gyms, días desde el último agarre fuerte), comparando salidas de duración y dureza parecidas. Hasta tener 6 salidas comparables, mostrar sólo 'faltan N salidas'. Probar con datos reales y con datos inventados de 10 salidas."
 
