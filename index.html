@@ -300,12 +300,12 @@ const SES={
   {id:'a4',grip:1,n:'Isométrico "parado en pedalines"',s:3,r:'45-60"',rest:90,kg:1,inc:2,secs:50,core:1,note:'Posición de ataque agarrando una barra al frente, como el manubrio. kg = barra + discos. Específico moto.'},
   {id:'a5',grip:1,n:'Suitcase carry pesado',s:3,r:'30 m por lado',rest:60,kg:1,inc:2,note:'Lumbar y oblicuos'},
   {id:'a6',n:'Pallof press en polea',s:3,r:'10 por lado',rest:45,kg:1,inc:2.5},
-  {id:'a8',n:'Extensión lumbar quieta',s:3,r:'30-45"',rest:45,secs:40,note:'Aguante de la espalda baja: lo que pide ir parado en la moto.'}]},
+  {id:'a8',n:'Extensión lumbar quieta',s:3,r:'30-45"',rest:45,secs:40,core:1,note:'Aguante de la espalda baja: lo que pide ir parado en la moto.'}]},
  B:{name:'Gym B',title:'Espalda alta, hombros, agarre',min:70,warm:"Remo o bici 5', band pull-aparts 2x15, rotaciones de hombro.",ex:[
   {id:'b1',grip:1,n:'Dominadas lastradas',s:4,r:'5-6',rest:150,kg:1,inc:2.5,core:1,lastre:1,note:'kg = lastre. Vacío = sin lastre.'},
   {id:'b2',n:'Remo con pecho apoyado',s:4,r:'10',rest:90,kg:1,inc:2.5,core:1,note:'Apretar escápulas 1" arriba'},
   {id:'b3',n:'Press de hombro (mancuerna de pie o landmine)',s:3,r:'8',rest:120,kg:1,inc:2,core:1},
-  {id:'b4',n:'Face pull',s:3,r:'15',rest:60,kg:1,inc:2.5},
+  {id:'b4',n:'Face pull',s:3,r:'15',rest:60,kg:1,inc:2.5,core:1},
   {id:'b5',n:'Rotación externa en polea',s:2,r:'15',rest:45,kg:1,inc:1},
   {id:'b7',grip:1,n:'Dead hang',s:3,r:'máx',rest:90,meas:'seg',core:1,note:'Manos al ancho del manubrio. Anotá tu mejor tiempo.'},
   {id:'b8',grip:1,n:'Wrist roller',s:3,r:'subidas',rest:60,kg:1,inc:1,note:'Palmas hacia abajo, como acelerando'},
@@ -321,6 +321,7 @@ const SES={
   {id:'c8',n:'Bird-dog',s:2,r:'6 por lado',rest:30,grp:'Bloque 3 · equilibrio y core'},
   {id:'c9',n:'Plancha Copenhagen',s:3,r:'20-30" por lado',rest:45,secs:25,grp:'Bloque 3 · equilibrio y core',note:'Aductores: los que aprietan la moto con las rodillas. La primera semana, 1 serie y con la rodilla en el banco.'}]}
 };
+for(const k in SES)SES[k].ex.sort((a,b)=>(b.core?1:0)-(a.core?1:0)); // lo principal primero: si se corta la sesión, se corta lo extra
 // Cómo se hace cada ejercicio. Fotos: free-exercise-db (dominio público), en img/ex/. f = aclaración cuando la foto no es exacta.
 const HOW={
  a1:{img:['a1-0','a1-1'],m:'Piernas, glúteos y zona media',c:['Barra apoyada arriba de la espalda (sobre los trapecios), no en el cuello.','Pies al ancho de los hombros, puntas un poco hacia afuera.','Bajá como sentándote atrás, hasta que la cadera quede a la altura de las rodillas o un poco más abajo.','Rodillas en la misma dirección que las puntas; pecho arriba y espalda firme.','Subí empujando el piso con todo el pie.']},
@@ -367,8 +368,8 @@ function howSheet(id){
  if(e.items)x+=e.items.map(it=>howBlock(it.h,it.n)).join('');
  sheet(x+`<button class="btn ghost" data-act="closesheet">Cerrar</button>`)}
 const ACT={
- Z2:{name:'Bici Z2',title:'Bici afuera, 75 a 120 min',li:['Ritmo en el que podés hablar en frases completas.','La base aeróbica es lo que más baja el arm pump.','Si hay MTB, mejor que la de ruta: suma agarre y trabajo parado.']},
- SUB:{name:'Bici con subidas',title:"Z2 con 4 x 3' fuertes en subida",li:["Salida de 75 a 120 min, casi toda en Z2.","En el medio, 4 subidas de 3' fuertes (podés hablar solo con palabras sueltas) con 3' suaves entre cada una.","La moto lleva el corazón al 90 % o más: esto lo entrena. En semana de descarga, solo Z2."]},
+ Z2:{name:'Bici Z2',title:'Bici afuera, 75 a 120 min',li:["¿Poco tiempo? 45' también cuenta: mejor corta que nada.",'Ritmo en el que podés hablar en frases completas.','La base aeróbica es lo que más baja el arm pump.','Si hay MTB, mejor que la de ruta: suma agarre y trabajo parado.']},
+ SUB:{name:'Bici con subidas',title:"Z2 con 4 x 3' fuertes en subida",li:["¿Poco tiempo? 45' con 2 subidas también cuenta: mejor corta que nada.","Salida de 75 a 120 min, casi toda en Z2.","En el medio, 4 subidas de 3' fuertes (podés hablar solo con palabras sueltas) con 3' suaves entre cada una.","La moto lleva el corazón al 90 % o más: esto lo entrena. En semana de descarga, solo Z2."]},
  REST:{name:'Descanso',title:'O 30 min de bici suave + movilidad',li:['Nada pesado: mañana hay moto.','Movilidad de cadera, hombros y muñecas.']},
  REC:{name:'Recuperación',title:'Bici suave 45-60 min (Z1-Z2) + movilidad torácica',li:['Nada de exigirse. Si es en bici, que sea plana: nada de MTB técnico, el antebrazo todavía está cansado.','Movilidad (10 min): libro abierto 2x8 por lado, 90/90 de cadera 2x6 por lado y estiramiento de flexores de cadera 2x30" por lado (una rodilla en el piso, empujá la cadera adelante sin arquear la espalda).','Post-moto: movilidad torácica y face pull liviano 2x20.','Si quedaron cargados los antebrazos: una pelota de tenis contra la mesa, 1-2 min por antebrazo moviendo la muñeca, y estiramiento de flexores 2x20". Alivia la sensación; no hace falta más.']},
  MOTO:{name:'MOTO',title:'Sábado de enduro',li:[]},
@@ -530,12 +531,14 @@ function planWeek(mon){
  const bike=(S.block.week!==4&&!S.retorno)?'SUB':'Z2'; // intervalos todas las semanas, salvo descarga o modo vuelta
  const bikeDone=days.some(p=>(S.bici[p.date]&&S.bici[p.date].tipo!=='REC')||(p.log&&p.log.status==='done'&&(p.log.type==='Z2'||p.log.type==='SUB')));
  const bp=days.filter(p=>!p.past&&bikePlan(p.date)&&!S.bici[p.date]).map(p=>p.i);
- let bikeDay=null,bikeOnSun=false;
+ let bikeDay=null,bikeOnSun=false,porBici=null;
  if(!bikeDone){
   if(bp.length)bikeDay=bp[0];
   else{const cand=days.filter(p=>isFree(p)&&gymAt[p.i]==null&&p.i!==6&&!near(p.i,-1)).map(p=>p.i);
    if(cand.length)bikeDay=cand.sort((x,y)=>Math.abs(x-1)-Math.abs(y-1)||x-y)[0];
-   else bikeOnSun=true}
+   else{porBici=['C','B'].find(g=>best.a[g]!=null&&best.a[g]!==6)||null; // sin día libre, la bici le gana a C y después a B
+    if(porBici){bikeDay=best.a[porBici];delete gymAt[bikeDay];if(!fresh)dropped.push(porBici)}
+    else bikeOnSun=true}}
  }
  for(const p of days){
   const mo=motoAt(p.date),bi=S.bici[p.date];
@@ -549,11 +552,11 @@ function planWeek(mon){
   if(gymAt[p.i]){p.kind=gymAt[p.i];p.moved=p.i!==DEFIDX[gymAt[p.i]];continue}
   if(Mfs.includes(p.i)){p.kind='MOTO';p.planned=true;continue}
   if(bp.includes(p.i)){p.kind=p.i===bikeDay?bike:'BICI';p.planned=true;continue}
-  if(p.i===bikeDay){p.kind=bike;p.moved=p.i!==1;continue}
+  if(p.i===bikeDay){p.kind=bike;p.moved=p.i!==1;if(porBici)p.quita=porBici;continue}
   if(p.i===6&&bikeOnSun&&!fresh){p.kind='Z2';p.moved=true;p.note="Es la bici que no entró en la semana: 75-90' suave y plano, sin MTB técnico.";continue}
   p.kind=near(p.i,-1)?'REST':(after.has(p.i)||p.i===6)?'REC':'LIBRE';
  }
- return{days,dropped,bike,MP,bikeDone,fresh}
+ return{days,dropped,bike,MP,bikeDone,fresh,porBici}
 }
 function kindName(k){return SES[k]?SES[k].name+' · '+SES[k].title:ACT[k]?ACT[k].name+(k==='MOTO'?'':' · '+ACT[k].title):k==='NOPUEDO'?'No puedo':k==='PASADO'?'Sin registro':k}
 
@@ -564,7 +567,7 @@ function suggestKg(id,inc,mode){
  let kg=+w.kg,why='igual que la última',bw=S.block.week;
  if(bw===4)why='descarga: misma carga, menos series';
  else if(mode&&mode.light)why='día liviano: sin subir';
- else if(w.feel==='sobro'){kg+=bw===1?inc:inc*2;why='la última te sobró'}
+ else if(w.feel==='sobro'){kg+=bw===1?inc:Math.min(inc*2,5);why='la última te sobró'}
  else if(w.feel==='justo'){if(bw>1){kg+=inc;why='progresión semana '+bw}else why='semana base'}
  else if(w.feel==='no'){if(bw===1){kg-=inc;why='la última no llegaste'}else why='la última no llegaste: repetí'}
  else if(w.feel==='parcial')why='la última quedó incompleta: repetí';
@@ -610,7 +613,7 @@ function whyTxt(p){const k=p.kind,d=p.date;
  if(k==='REST')return 'Mañana hay moto: hoy nada pesado, así llegás fresco.';
  if(k==='REC')return motoAt(addDays(d,-1))?'Ayer anduviste en moto: hoy toca recuperar.':p.i===6?'Mañana arranca la semana con piernas: hoy suave.':'Día de recuperación.';
  if(k==='LIBRE')return 'Lo de la semana ya está ubicado en otros días: hoy descansás.';
- if(['Z2','SUB','BICI'].includes(k))return (p.moved?'Se corrió al primer día libre. ':'')+'La bici larga es lo que más baja el arm pump.';
+ if(['Z2','SUB','BICI'].includes(k))return (p.quita?`Va en lugar del ${SES[p.quita].name}: no quedaba otro día. `:p.moved?'Se corrió al primer día libre. ':'')+'La bici larga es lo que más baja el arm pump.';
  return ''}
 const why=p=>{const x=whyTxt(p);return x?`<div class="why">${ic('info')}<span>${x}</span></div>`:''};
 // ---------- Coach: cómo venís, según el historial ----------
@@ -625,8 +628,10 @@ function motivosRep(){const seen={},c={};
  for(const f of Object.keys(S.log).sort().reverse()){const ex=S.log[f].ex;if(!ex)continue;
   for(const id in ex){seen[id]=(seen[id]||0)+1;const x=ex[id];if(seen[id]<=3&&x.why&&x.why!=='hecho'&&x.sets<x.of){const k=id+'|'+x.why;c[k]=(c[k]||0)+1}}}
  return Object.keys(c).filter(k=>c[k]>=2).map(k=>{const[id,why]=k.split('|');return{id,why,n:c[k]}}).sort((a,b)=>(b.why==='dolor')-(a.why==='dolor')||b.n-a.n)}
+function diasSinBici(){const t=todayStr();for(let i=0;i<=120;i++){const d=addDays(t,-i),b=S.bici[d],L=S.log[d];if(d<(S.start||t))return Math.max(0,i-1);if((b&&b.tipo!=='REC'&&+b.min>=45)||(L&&L.status==='done'&&(L.type==='Z2'||L.type==='SUB')))return i}return 120}
 function insights(P,full){
  const out=[],t=todayStr(),n=gymCount(mondayOf(t));
+ const sb=diasSinBici();if(sb>=14)out.push(['bici',`Hace ${sb} días que no hacés una bici de 45' o más. Es lo primero para aguantar más en la moto: esta semana va antes que el Gym C.`]);
  const left=P.days.filter(p=>GYM.includes(p.kind)&&!p.done&&!p.inprog&&p.date>=t);
  if(n>=3)out.push(['check','Semana de gym completa: 3 de 3. Bien ahí.']);
  else if(left.length)out.push(['gym',`Llevás ${n} de 3 gyms esta semana. Faltan: ${left.map(p=>SES[p.kind].name+(p.today?' hoy':' el '+DIAS_L[p.i])).join(', ')}.`]);
@@ -634,7 +639,7 @@ function insights(P,full){
  const st=streak();if(st>=2)out.push(['zap',`${st} semanas seguidas con 2 o más gyms. La constancia es lo que más rinde.`]);
  const lg=lastGymDay();if(lg!=null&&lg>=6&&n===0)out.push(['clock',`Hace ${lg} días que no vas al gym: volvé con la versión liviana.`]);
  const pv=pumpTrend();if(pv.length>=3){const a=pv[pv.length-1],b=pv.slice(0,-1).reduce((x,y)=>x+y,0)/(pv.length-1);
-  if(a<=b-1)out.push(['moto',`El arm pump viene bajando (${pv.join(' → ')} de 5). Lo que hacés funciona.`]);
+  if(a<=b-1)out.push(['moto',`El arm pump viene bajando (${pv.join(' → ')} de 5). Buena señal, pero todavía son pocas salidas.`]);
   else if(a>=b+1)out.push(['moto',`El arm pump viene subiendo (${pv.join(' → ')} de 5): no saltees la bici Z2 ni el Gym B.`])}
  const kt=kgTrend();if(kt.up.length){const id=kt.up[0];out.push(['chart',`Subiste peso en ${kt.up.length} ejercicio${kt.up.length>1?'s':''}. El que más: ${EXNAME[id]||id}, de ${kt.first[id]} a ${kt.last[id]} kg.`])}
  if(!out.length&&full)out.push(['info','Todavía hay pocos datos. A medida que anotes gym, moto y bici, acá vas a ver cómo venís.']);
@@ -738,7 +743,9 @@ function renderHoy(){
  const lm=lastMoto();
  if(lm&&z5(lm.m,'pump')>=4)h+=`<div class="ban warn">Arm pump ${z5(lm.m,'pump')}/5 (${NIV[z5(lm.m,'pump')-1].toLowerCase()}) el ${fmtD(lm.d)}. Esta semana no saltees la bici Z2 (es lo que más lo baja) y salí suave los primeros 15'. Revisá manetas, embrague y suspensión (Ajustes → checklist). <b>Al médico</b> si tarda más de 15 min en irse al parar, viene con hormigueo o dedos dormidos, o te hace soltar el manubrio.</div>`;
  if(lm&&z5(lm.m,'espalda')>=4)h+=`<div class="ban warn">Espalda ${z5(lm.m,'espalda')}/5 después de la moto. Revisá el setup (Ajustes → checklist) y sumá face pull + movilidad torácica.</div>`;
- if(P.dropped.length)h+=`<div class="ban bad">Esta semana no entra ${P.dropped.map(g=>SES[g].name).join(' ni ')} sin pisar la moto. No la fuerces: el lunes arranca de nuevo.<ul class="l">${P.dropped.map(g=>'<li>'+DROPTIP[g]+'</li>').join('')}</ul></div>`;
+ if(P.porBici&&P.dropped.includes(P.porBici))h+=`<div class="ban">${SES[P.porBici].name} queda afuera esta semana para que entre la bici, que es lo que más te rinde. ${DROPTIP[P.porBici]}</div>`;
+ const noEntra=P.dropped.filter(g=>g!==P.porBici);
+ if(noEntra.length)h+=`<div class="ban bad">Esta semana no entra ${noEntra.map(g=>SES[g].name).join(' ni ')} sin pisar la moto. No la fuerces: el lunes arranca de nuevo.<ul class="l">${noEntra.map(g=>'<li>'+DROPTIP[g]+'</li>').join('')}</ul></div>`;
  if(lm&&lm.d>=addDays(t,-2)){const hi=ZONAS.map(z=>z[0]).filter(k=>k!=='pump'&&k!=='espalda'&&z5(lm.m,k)>=4);
   if(hi.length)h+=`<div class="ban warn">Quedaste cargado después de la moto del ${fmtD(lm.d)}: ${hi.map(k=>ZN(k).toLowerCase()+' '+z5(lm.m,k)+'/5').join(', ')}. Si hoy toca gym, elegí la versión liviana y sumá movilidad.</div>`}
  const yd=addDays(t,-1),ym=S.moto[yd];
@@ -867,9 +874,10 @@ function renderWork(){
  if(motoEn2(d.date))h+=`<div class="ban warn">${GRIPMSG}</div>`;
  else if(d.type==='C')h+=`<div class="ban warn">Nada al fallo hoy: se viene la moto.</div>`;
  h+=`<div class="card"><div class="k">Calentamiento (10')</div><div class="mut">${s.warm}</div></div>`;
- let grp='',num=0;
+ let grp='',num=0,extra=false;
  for(const e of vis){
   const x=d.ex[e.id],a=altOf(e.id,x.alt);num++;
+  if(!e.core&&!extra){extra=true;h+=`<h2>Si te da el tiempo</h2><div class="note">Lo principal para la moto ya está arriba. Esto suma, pero no alargues la sesión por terminarlo.</div>`}
   if(e.grp&&e.grp!==grp){grp=e.grp;h+=`<h2>${esc(grp)}</h2>`}
   const all=x.done.every(Boolean);
   h+=`<div class="ex ${all?'alldone':''}"><div class="exh"><span class="n">${all?ic('check'):String(num).padStart(2,'0')}</span><div><div class="t">${esc(a?a.n:e.n)}</div>${a?`<div class="mut">En lugar de ${esc(e.n)}</div>`:''}${e.grip&&motoEn2(d.date)?'<span class="tag warn">Agarre liviano</span>':''}<div><span class="sr">${x.done.length} × ${esc(a&&a.r||e.r)}</span> <span class="mut">· pausa ${e.rest?(e.rest>=60?(e.rest/60)+"'":e.rest+'"'):'–'}</span></div>${a?`<div class="note">${esc(a.h)}</div>`:`<button class="howl" data-act="how" data-id="${e.id}">${ic('info')} Cómo se hace</button>`}${ALT[e.id]?`<div><button class="howl" data-act="alt" data-id="${e.id}">⇄ ${a?'Cambiar o volver':'Ocupado: hacer otro'}</button></div>`:''}</div>${a?'':thumb(e.id)}</div>`;
