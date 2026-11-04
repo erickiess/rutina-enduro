@@ -195,6 +195,7 @@ nav button.on span{background:var(--accbg);color:var(--acc)}
 .bars{display:flex;gap:8px;align-items:flex-end;height:90px;margin-top:10px}
 .bars div{flex:1;background:linear-gradient(180deg,var(--acc2),var(--acc));border-radius:6px 6px 2px 2px;min-height:4px;position:relative}
 .bars span{position:absolute;bottom:-20px;left:-4px;right:-4px;text-align:center;font-size:10px;color:var(--mut)}
+.qsg{font-weight:700;font-size:13px;margin:14px 0 2px}.qsg small{color:var(--mut);font-weight:600}.qsg.casi,.qsg.noll{color:#e8a35c}.qsg.bien{color:#6fcf97}.qs{padding:6px 0;border-top:1px solid var(--line)}.qst{font-size:13px}.qst td,.qst th{padding:6px 3px}.qsc{margin:8px 0;font-size:14px}
 table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
 tr:last-child td{border-bottom:0}
 
@@ -967,12 +968,81 @@ function dayOptions(d){
  }
  h+=`<button class="btn ghost" data-act="closesheet">Cerrar</button>`;sheet(h)}
 
+// ---------- Qué te sirve ----------
+// Reglas simples y a la vista. Nada se afirma sin datos: con pocas salidas sólo se listan.
+const QS_ETQ=[['casi','Casi nunca lo hacés'],['noll','Siempre "No llegué"'],['estan','Estancado'],['bien','Viene bien'],['poco','Pocos datos']];
+const QS_TERR={trabado:'trabado',canadon:'cañadón',mixto:'mixto'};
+const qsKg=v=>v!==''&&v!=null&&!isNaN(+v)?+v:null;
+const qsMean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+function qsEjercicio(e,t){ // e: ejercicio de SES. Ventana de series: 28 días; cargas: todo el historial sin días livianos.
+ const lim=addDays(t,-28),own=[],alts=[],mot={};
+ let tocaba=0,hechas=0,sets=0,of=0,nAlt=0;
+ for(const d of Object.keys(S.log).sort()){
+  const L=S.log[d],x=L.ex&&L.ex[e.id];if(!x||!(x.of>0))continue;
+  const hecha=x.sets>0,liv=!!(L.mode&&L.mode.light),kg=qsKg(x.kg);
+  if(hecha&&!liv){(x.alt?alts:own).push({d,kg,feel:x.feel,alt:x.alt})}
+  if(d<=lim)continue;
+  tocaba++;sets+=x.sets||0;of+=x.of;if(hecha){hechas++;if(x.alt)nAlt++}
+  const ms=[];if(x.why&&x.why!=='hecho')ms.push(motivoName(x.why));if(x.nota&&x.nota.trim())ms.push(x.nota.trim());
+  for(const m of ms){const o=mot[m]||(mot[m]={n:0,d:''});o.n++;o.d=d}}
+ const pct=of?Math.round(100*sets/of):null;
+ const kgs=own.map(r=>r.kg).filter(k=>k!=null),k3=kgs.slice(-3),f3=own.filter(r=>r.kg!=null).slice(-3),f2=own.slice(-2);
+ let et='poco';
+ if(tocaba>=2&&pct<25)et='casi';
+ else if(f2.length===2&&f2.every(r=>r.feel==='no'))et='noll';
+ else if(e.kg&&f3.length===3&&k3.every(k=>k===k3[0])&&!f3.some(r=>r.feel==='sobro'))et='estan';
+ else if((kgs.length>=2&&kgs[kgs.length-1]>k3[0])||(tocaba>=2&&pct>75))et='bien';
+ let top=null;for(const m in mot)if(!top||mot[m].n>top.n||(mot[m].n===top.n&&mot[m].d>top.d))top={m,n:mot[m].n,d:mot[m].d};
+ return{e,et,pct,sets,of,tocaba,hechas,nAlt,kgs:kgs.slice(-4),altKg:alts.length?alts[alts.length-1]:null,top,any:own.length+alts.length>0||of>0}}
+function qsRow(r){
+ const tr=r.kgs.length?r.kgs.join(' → ')+' kg':'sin carga';
+ return `<div class="qs"><b>${esc(r.e.n)}</b><div class="mut">${r.of?`${r.pct}% de series (${r.sets}/${r.of}) · ${r.tocaba} ${r.tocaba===1?'vez':'veces'} · `:'sin datos en 4 semanas · '}${tr}${r.nAlt?` · ${r.nAlt}× con parecido${r.altKg&&r.altKg.kg!=null?' ('+esc(EXNAME[r.altKg.alt]||'')+' '+r.altKg.kg+' kg)':''}`:''}</div>${r.top?`<div class="note">Motivo: ${esc(r.top.m)}${r.top.n>1?' ×'+r.top.n:''}</div>`:''}</div>`}
+function qsMotos(t){
+ const ds=[...new Set([...Object.keys(S.moto),...Object.keys(S.log).filter(d=>S.log[d].type==='MOTO')])].sort();
+ return ds.map(d=>{const m=motoAt(d)||{};let bici=0,gyms=0,dBC=null;
+  for(let i=1;i<=7;i++){const x=addDays(d,-i),b=S.bici[x],L=S.log[x];
+   if(b&&b.tipo!=='REC')bici+=+b.min||0;
+   if(L&&L.status==='done'&&GYM.includes(L.type))gyms++}
+  for(let i=1;i<=60;i++){const L=S.log[addDays(d,-i)];if(L&&L.status==='done'&&(L.type==='B'||L.type==='C')){dBC=i;break}}
+  const h=parseFloat(String(m.horas).replace(',','.'));
+  return{d,h:h>0?h:null,terr:m.terreno||'',pump:z5(m,'pump'),lumbar:z5(m,'lumbar'),hombros:z5(m,'hombros'),general:z5(m,'general'),bici,gyms,dBC}})}
+// Grupos de salidas parecidas: mismo terreno (vacío = grupo aparte) y hasta 0,5 h entre la más corta y la más larga del grupo.
+function qsGrupos(comp){const out=[],by={};for(const r of comp)(by[r.terr]=by[r.terr]||[]).push(r);
+ for(const k in by){const a=by[k].slice().sort((x,y)=>x.h-y.h);let i=0;while(i<a.length){let j=i;while(j+1<a.length&&a[j+1].h-a[i].h<=0.5)j++;out.push(a.slice(i,j+1));i=j+1}}
+ return out}
+// Dentro de cada grupo (2 o más salidas) las salidas con menos y con más de `key` van a cada mitad; el medio, si sobra una, queda afuera.
+function qsCompara(comp,key){const lo=[],hi=[];
+ for(const g of qsGrupos(comp)){if(g.length<2)continue;const a=g.slice().sort((x,y)=>x[key]-y[key]||(x.d<y.d?-1:1));
+  if(a[0][key]===a[a.length-1][key])continue;const k=Math.floor(a.length/2);lo.push(...a.slice(0,k));hi.push(...a.slice(a.length-k))}
+ const ml=lo.length?qsMean(lo.map(r=>r.pump)):null,mh=hi.length?qsMean(hi.map(r=>r.pump)):null;
+ return{nl:lo.length,nh:hi.length,ml,mh,diff:lo.length&&hi.length?mh-ml:null}}
+function qsTexto(c,que){const f=x=>x.toFixed(1).replace('.',',');
+ if(c.nl<2||c.nh<2||Math.abs(c.diff)<0.5)return `<b>${que}:</b> todavía no se ve diferencia <span class="mut">(${c.nh} salidas con más, ${c.nl} con menos)</span>`;
+ return `<b>${que}:</b> con más, el arm pump medio fue ${f(c.mh)} (${c.nh} salidas) y con menos ${f(c.ml)} (${c.nl}): ${f(Math.abs(c.diff))} puntos ${c.diff>0?'más alto (peor)':'más bajo (mejor)'}. <span class="mut">Tendencia, no prueba.</span>`}
+function renderQueTeSirve(){
+ const t=todayStr();let h='<h2>Qué te sirve</h2><div class="card"><div class="k">Ejercicios (últimas 4 semanas)</div>';
+ const rows=[];for(const k of GYM)for(const e of SES[k].ex){const r=qsEjercicio(e,t);if(r.any)rows.push(r)}
+ if(!rows.length)h+='<div class="mut">Todavía no hay sesiones guardadas.</div>';
+ for(const [et,nm] of QS_ETQ){const g=rows.filter(r=>r.et===et);if(!g.length)continue;
+  h+=`<div class="qsg ${et}">${nm} <small>${g.length}</small></div>`+g.map(qsRow).join('')}
+ h+='<div class="note">Los días livianos no cuentan para la carga. Un parecido cuenta como hecho del original.</div>';
+ const mo=qsMotos(t),comp=mo.filter(r=>r.h&&r.pump>0);
+ h+='<div class="k" style="margin-top:16px">Moto contra lo hecho los 7 días antes</div>';
+ if(!mo.length)h+='<div class="mut">Sin salidas registradas.</div>';
+ else{h+='<table class="qst"><tr><th>Fecha</th><th>Horas</th><th title="arm pump / lumbar / hombros / general">P·L·H·G</th><th>Bici</th><th>Gym</th><th>Últ. B/C</th></tr>'+
+  mo.slice().reverse().slice(0,10).map(r=>`<tr><td>${fmtD(r.d)}${r.terr?`<br><small class="mut">${QS_TERR[r.terr]||esc(r.terr)}</small>`:''}</td><td>${r.h==null?'–':String(r.h).replace('.',',')}</td><td>${[r.pump,r.lumbar,r.hombros,r.general].map(v=>v||'–').join('·')}</td><td>${r.bici}'</td><td>${r.gyms}</td><td>${r.dBC==null?'–':r.dBC+' d'}</td></tr>`).join('')+'</table>'+
+  '<div class="note">P·L·H·G = arm pump, lumbar, hombros, general (1 a 5, más alto es peor). Bici: minutos sin contar suave.</div>';
+  if(comp.length<6)h+=`<div class="ban">Faltan ${6-comp.length} ${6-comp.length===1?'salida':'salidas'} para comparar. Cuentan las que tienen horas y arm pump (hoy ${comp.length}).</div>`;
+  else h+=`<div class="qsc">${qsTexto(qsCompara(comp,'bici'),'Minutos de bici')}</div><div class="qsc">${qsTexto(qsCompara(comp,'gyms'),'Sesiones de gym')}</div><div class="note">Se comparan salidas parecidas (mismo terreno, hasta 0,5 h de diferencia).</div>`}
+ return h+'</div>'}
+
 /* ============ Vista PROGRESO ============ */
 function renderProgreso(){
  const t=todayStr(),mon=mondayOf(t);
  let h='<header class="top"><h1 class="ttl">Progreso</h1></header>'+coachCard(planWeek(mon),true)+'<h2>Sesiones de gym por semana</h2><div class="card"><div class="bars">';
  for(let w=7;w>=0;w--){const m=addDays(mon,-7*w),n=gymCount(m);h+=`<div style="height:${Math.max(4,n/3*100)}%;${n<2?'background:#6b4a33':''}" title="${n}/3"><span>${pd(m).getDate()}/${pd(m).getMonth()+1}</span></div>`}
  h+='</div><div style="height:18px"></div><div class="note">Cada barra es una semana (máx 3). Las oscuras tuvieron menos de 2 sesiones.</div></div>';
+ h+=renderQueTeSirve();
  const dates=Object.keys(S.log).sort();
  const hist={};
  for(const d of dates){const L=S.log[d];if(!L.ex)continue;for(const id in L.ex){const x=L.ex[id];const v=x.kg!==''&&x.kg!=null?x.kg+' kg':x.val?x.val+(id==='b7'?' s':' min'):null;if(v){const hk=x.alt||id;(hist[hk]=hist[hk]||[]).push({d,v,f:x.feel})}}}
