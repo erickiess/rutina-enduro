@@ -433,7 +433,7 @@ for(const id in ALT)for(const a of ALT[id])EXNAME[a.id]=a.n;
 /* ============ Estado ============ */
 const KEY='enduroGym.v1';
 let S=load();
-function blank(){return{v:1,block:{week:1,cycle:1},retorno:false,zeroRun:0,lastWeek:null,log:{},weights:{},unav:{},swap:{},noMoto:{},moto:{},motoDay:{},bici:{},plan:{},motoWeek:{},draft:null,weekMsg:null,setup:{}}}
+function blank(){return{v:1,block:{week:1,cycle:1},retorno:false,zeroRun:0,lastWeek:null,log:{},weights:{},unav:{},swap:{},noMoto:{},moto:{},motoDay:{},bici:{},plan:{},motoWeek:{},draft:null,weekMsg:null,setup:{},reacOk:null}}
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1)return Object.assign(blank(),s)}catch(e){}return blank()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncSoon()}
 // ---------- Sync a GitHub ----------
@@ -550,10 +550,10 @@ function planWeek(mon){
   if(Mfs.includes(p.i)){p.kind='MOTO';p.planned=true;continue}
   if(bp.includes(p.i)){p.kind=p.i===bikeDay?bike:'BICI';p.planned=true;continue}
   if(p.i===bikeDay){p.kind=bike;p.moved=p.i!==1;continue}
+  if(p.i===6&&bikeOnSun&&!fresh){p.kind='Z2';p.moved=true;p.note="Es la bici que no entró en la semana: 75-90' suave y plano, sin MTB técnico.";continue}
   p.kind=near(p.i,-1)?'REST':(after.has(p.i)||p.i===6)?'REC':'LIBRE';
-  if(p.i===6&&bikeOnSun&&!fresh)p.note="No entró el Z2 en la semana: estirá esta bici a 75-90' suave.";
  }
- return{days,dropped,bike,MP}
+ return{days,dropped,bike,MP,bikeDone,fresh}
 }
 function kindName(k){return SES[k]?SES[k].name+' · '+SES[k].title:ACT[k]?ACT[k].name+(k==='MOTO'?'':' · '+ACT[k].title):k==='NOPUEDO'?'No puedo':k==='PASADO'?'Sin registro':k}
 
@@ -711,10 +711,29 @@ function motoSheet(d){const m=S.moto[d]||(motoAt(d)||{}),t=todayStr();
  <button class="btn" data-act="motosave" data-d="${d}">Guardar</button>${motoAt(d)?`<button class="btn ghost" data-act="motodel" data-d="${d}">Borrar esta salida</button>`:''}<button class="btn ghost" data-act="closesheet">Cancelar</button>`)}
 
 /* ============ Vista HOY ============ */
+// ---------- Reacomodo de la semana ----------
+// Lo que ya tendría que estar hecho y no está: el planificador lo volvió a ubicar y acá se muestra cómo quedó.
+function reacomodo(P){
+ const t=todayStr(),ti=dow(t);if(P.fresh)return null;
+ const gyms=GYM.filter(g=>DEFIDX[g]<ti&&!P.days.some(p=>p.kind===g&&(p.done||p.inprog))),isBici=p=>['Z2','SUB','BICI'].includes(p.kind);
+ const falta=gyms.map(g=>SES[g].name);
+ if(!P.bikeDone&&ti>1)falta.push('la bici');
+ if(!falta.length)return null;
+ const resto=P.days.filter(p=>p.date>=t&&!p.done);
+ const lista=resto.map(p=>(p.today?'Hoy':DIAS[p.i])+' '+kindParts(p.kind)[0]).join(' · ');
+ // Cerrado el aviso, vuelve sólo si cambia lo pendiente o el día al que pasó, no por el simple paso de los días.
+ const dia=f=>{const p=resto.find(f);return p?p.i:'x'};
+ const key=[mondayOf(t),...gyms.map(g=>g+dia(p=>p.kind===g)),P.bikeDone||ti<=1?'':'bici'+dia(isBici)].join('|');
+ const sinBici=!P.bikeDone&&!resto.some(isBici);
+ return{falta,lista,key,sinBici}}
+function reacomodoBan(P){
+ const r=reacomodo(P);if(!r||S.reacOk===r.key)return'';
+ return `<div class="ban warn"><button data-act="reacok" data-v="${esc(r.key)}">✕</button><b>Se reacomodó la semana.</b> Quedó pendiente: ${r.falta.map(esc).join(', ')}.<div style="margin-top:6px">Así sigue: ${esc(r.lista)}.</div>${r.sinBici?'<div style="margin-top:6px">La bici no entra esta semana.</div>':''}<div class="row"><button class="btn sm ghost" style="float:none;color:inherit;font-size:14px" data-act="tab" data-v="semana">Cambiar algo</button></div></div>`}
 function renderHoy(){
  const t=todayStr(),P=planWeek(mondayOf(t)),p=P.days[dow(t)];
  let h=`<header class="top">${helpBtn()}<div class="eyebrow">${DIAS_L[dow(t)]} ${pd(t).getDate()} de ${MES[pd(t).getMonth()]}</div><h1 class="ttl">Hoy</h1>${blockBar()}</header>`;
  if(S.weekMsg)h+=`<div class="ban"><button data-act="dismiss">✕</button>${esc(S.weekMsg)}</div>`;
+ h+=reacomodoBan(P);
  if(S.draft&&S.draft.date!==t)h+=`<div class="ban warn">Quedó sin terminar ${SES[S.draft.type].name} del ${fmtD(S.draft.date)}.<div class="row"><button class="btn sm" data-act="resume">Abrir y terminar</button><button class="btn sm ghost" data-act="discard">Descartar</button></div></div>`;
  const lm=lastMoto();
  if(lm&&z5(lm.m,'pump')>=4)h+=`<div class="ban warn">Arm pump ${z5(lm.m,'pump')}/5 (${NIV[z5(lm.m,'pump')-1].toLowerCase()}) el ${fmtD(lm.d)}. Esta semana no saltees la bici Z2 (es lo que más lo baja) y salí suave los primeros 15'. Revisá manetas, embrague y suspensión (Ajustes → checklist). <b>Al médico</b> si tarda más de 15 min en irse al parar, viene con hormigueo o dedos dormidos, o te hace soltar el manubrio.</div>`;
@@ -1002,6 +1021,9 @@ function diffMsg(before,after){
  for(const g of GYM){const a=before.days.find(p=>p.kind===g&&!p.done),b=after.days.find(p=>p.kind===g&&!p.done);
   if(a&&b&&a.i!==b.i)out.push(`${SES[g].name} pasa al ${DIAS_L[b.i]}`);
   if(a&&!b&&after.dropped.includes(g))out.push(`${SES[g].name} no entra esta semana`)}
+ const isB=p=>['Z2','SUB','BICI'].includes(p.kind)&&!p.done,ba=before.days.find(isB),bb=after.days.find(isB);
+ if(ba&&bb&&ba.i!==bb.i)out.push(`La bici pasa al ${DIAS_L[bb.i]}`);
+ if(ba&&!bb&&!after.bikeDone)out.push('La bici no entra esta semana');
  return out.join(' · ')}
 function replanDo(fn){const mon=mondayOf(todayStr()),b=planWeek(mon);fn();save();const a=planWeek(mon),m=diffMsg(b,a);sheet('');render();toast(m||'Listo, semana reacomodada')}
 
@@ -1013,6 +1035,7 @@ document.addEventListener('click',e=>{
  switch(a){
  case 'tab':view=v;sheet('');render();scrollTo(0,0);break;
  case 'dismiss':S.weekMsg=null;save();render();break;
+ case 'reacok':S.reacOk=v;save();render();break;
  case 'closesheet':if(e.target===el||el.tagName==='BUTTON')sheet('');break;
  case 'checkin':openCheckin(v);break;
  case 'ci':CI[el.dataset.q]=+v;drawCheckin();break;
