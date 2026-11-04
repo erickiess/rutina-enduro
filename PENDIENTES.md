@@ -11,7 +11,7 @@ Reglas para todas las etapas:
 - Subir la versión de `sw.js`, probar en el preview `enduro-gym` y actualizar `RESUMEN.md` y el mapa.
 - Este repo es público: no escribir acá datos personales ni resultados de Erick.
 
-## Etapa 1: medir el aguante (Sonnet) — HECHA (v23, 04/11/2026)
+## Etapa 1: medir el aguante (Sonnet) — HECHA, simplificada (v24: sólo `terreno` opcional; Erick descartó anotar antebrazo/paradas). La etapa 2 compara salidas por horas y terreno.
 
 Hoy la moto se anota con molestias de 1 a 5, pero no cuánto se aguantó, que es el objetivo.
 

@@ -532,10 +532,12 @@ function planWeek(mon){
  const bikeDone=days.some(p=>(S.bici[p.date]&&S.bici[p.date].tipo!=='REC')||(p.log&&p.log.status==='done'&&(p.log.type==='Z2'||p.log.type==='SUB')));
  const bp=days.filter(p=>!p.past&&bikePlan(p.date)&&!S.bici[p.date]).map(p=>p.i);
  let bikeDay=null,bikeOnSun=false,porBici=null;
+ const aDay=done.A!==undefined?done.A:best.a.A; // piernas cargadas: la bici del día siguiente da pocas ganas y rinde menos
  if(!bikeDone){
   if(bp.length)bikeDay=bp[0];
   else{const cand=days.filter(p=>isFree(p)&&gymAt[p.i]==null&&p.i!==6&&!near(p.i,-1)).map(p=>p.i);
-   if(cand.length)bikeDay=cand.sort((x,y)=>Math.abs(x-1)-Math.abs(y-1)||x-y)[0];
+   const pen=x=>aDay!=null&&x===aDay+1?10:0;
+    if(cand.length)bikeDay=cand.sort((x,y)=>(pen(x)+Math.abs(x-1))-(pen(y)+Math.abs(y-1))||x-y)[0];
    else{porBici=['C','B'].find(g=>best.a[g]!=null&&best.a[g]!==6)||null; // sin día libre, la bici le gana a C y después a B
     if(porBici){bikeDay=best.a[porBici];delete gymAt[bikeDay];if(!fresh)dropped.push(porBici)}
     else bikeOnSun=true}}
@@ -552,7 +554,7 @@ function planWeek(mon){
   if(gymAt[p.i]){p.kind=gymAt[p.i];p.moved=p.i!==DEFIDX[gymAt[p.i]];continue}
   if(Mfs.includes(p.i)){p.kind='MOTO';p.planned=true;continue}
   if(bp.includes(p.i)){p.kind=p.i===bikeDay?bike:'BICI';p.planned=true;continue}
-  if(p.i===bikeDay){p.kind=bike;p.moved=p.i!==1;if(porBici)p.quita=porBici;continue}
+  if(p.i===bikeDay){const trasA=aDay!=null&&p.i===aDay+1&&!bp.includes(p.i);p.kind=trasA?'Z2':bike;p.moved=p.i!==1;if(porBici)p.quita=porBici;if(trasA)p.note='Ayer tocaron piernas: hoy bici suave y plana, sin intervalos. Si no te da, pasala al día siguiente.';continue}
   if(p.i===6&&bikeOnSun&&!fresh){p.kind='Z2';p.moved=true;p.note="Es la bici que no entró en la semana: 75-90' suave y plano, sin MTB técnico.";continue}
   p.kind=near(p.i,-1)?'REST':(after.has(p.i)||p.i===6)?'REC':'LIBRE';
  }
