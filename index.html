@@ -435,7 +435,7 @@ for(const id in ALT)for(const a of ALT[id])EXNAME[a.id]=a.n;
 /* ============ Estado ============ */
 const KEY='enduroGym.v1';
 let S=load();
-function blank(){return{v:1,block:{week:1,cycle:1},retorno:false,zeroRun:0,lastWeek:null,log:{},weights:{},unav:{},swap:{},noMoto:{},moto:{},motoDay:{},bici:{},plan:{},motoWeek:{},draft:null,weekMsg:null,setup:{},reacOk:null}}
+function blank(){return{v:1,block:{week:1,cycle:1},retorno:false,zeroRun:0,lastWeek:null,log:{},weights:{},unav:{},swap:{},noMoto:{},moto:{},motoDay:{},bici:{},plan:{},motoWeek:{},draft:null,weekMsg:null,setup:{},reacOk:null,reglas:[]}}
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1)return Object.assign(blank(),s)}catch(e){}return blank()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncSoon()}
 // ---------- Sync a GitHub ----------
@@ -575,9 +575,11 @@ function suggestKg(id,inc,mode){
  else if(w.feel==='no'){if(bw===1){kg-=inc;why='la última no llegaste'}else why='la última no llegaste: repetí'}
  else if(w.feel==='parcial')why='la última quedó incompleta: repetí';
  if(S.retorno){kg*=0.9;why='modo vuelta (-10%)'}
+ const rb=!S.retorno&&bw!==4&&!(mode&&mode.light)?rBaja(id):null; // una regla sólo puede bajar
+ if(rb)return{kg:Math.min(round(+w.kg*0.9,inc),round(kg,inc)),why:'regla: 10 % menos',regla:rb.id};
  return{kg:round(kg,inc),why}}
 function setsFor(e,mode){let s=e.s;if(S.block.week===4)s=Math.max(1,Math.round(s*0.6));if(mode.light)s=Math.max(Math.min(2,s),s-1);return s}
-function visibleEx(type,mode){return SES[type].ex.filter(e=>!mode.express||e.core)}
+function visibleEx(type,mode){return rOrden(type).filter(e=>!mode.express||e.core)}
 
 /* ============ UI helpers ============ */
 function toast(m){const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}
@@ -743,6 +745,7 @@ function renderHoy(){
  let h=`<header class="top">${helpBtn()}<div class="eyebrow">${DIAS_L[dow(t)]} ${pd(t).getDate()} de ${MES[pd(t).getMonth()]}</div><h1 class="ttl">Hoy</h1>${blockBar()}</header>`;
  if(S.weekMsg)h+=`<div class="ban"><button data-act="dismiss">✕</button>${esc(S.weekMsg)}</div>`;
  h+=reacomodoBan(P);
+ h+=reglasBan();
  if(S.draft&&S.draft.date!==t)h+=`<div class="ban warn">Quedó sin terminar ${SES[S.draft.type].name} del ${fmtD(S.draft.date)}.<div class="row"><button class="btn sm" data-act="resume">Abrir y terminar</button><button class="btn sm ghost" data-act="discard">Descartar</button></div></div>`;
  const lm=lastMoto();
  if(lm&&z5(lm.m,'pump')>=4)h+=`<div class="ban warn">Arm pump ${z5(lm.m,'pump')}/5 (${NIV[z5(lm.m,'pump')-1].toLowerCase()}) el ${fmtD(lm.d)}. Esta semana no saltees la bici Z2 (es lo que más lo baja) y salí suave los primeros 15'. Revisá manetas, embrague y suspensión (Ajustes → checklist). <b>Al médico</b> si tarda más de 15 min en irse al parar, viene con hormigueo o dedos dormidos, o te hace soltar el manubrio.</div>`;
@@ -751,7 +754,7 @@ function renderHoy(){
  const noEntra=P.dropped.filter(g=>g!==P.porBici);
  if(noEntra.length)h+=`<div class="ban bad">Esta semana no entra ${noEntra.map(g=>SES[g].name).join(' ni ')} sin pisar la moto. No la fuerces: el lunes arranca de nuevo.<ul class="l">${noEntra.map(g=>'<li>'+DROPTIP[g]+'</li>').join('')}</ul></div>`;
  if(lm&&lm.d>=addDays(t,-2)){const hi=ZONAS.map(z=>z[0]).filter(k=>k!=='pump'&&k!=='espalda'&&z5(lm.m,k)>=4);
-  if(hi.length)h+=`<div class="ban warn">Quedaste cargado después de la moto del ${fmtD(lm.d)}: ${hi.map(k=>ZN(k).toLowerCase()+' '+z5(lm.m,k)+'/5').join(', ')}. Si hoy toca gym, elegí la versión liviana y sumá movilidad.</div>`}
+  if(hi.length&&!rLiv())h+=`<div class="ban warn">Quedaste cargado después de la moto del ${fmtD(lm.d)}: ${hi.map(k=>ZN(k).toLowerCase()+' '+z5(lm.m,k)+'/5').join(', ')}. Si hoy toca gym, elegí la versión liviana y sumá movilidad.</div>`}
  const yd=addDays(t,-1),ym=S.moto[yd];
  if(ym&&!ZONAS.some(([k])=>k!=='pump'&&z5(ym,k)))
   h+=`<div class="card"><div class="hh" style="margin:0">${badge('MOTO')}<div><div class="k">¿Cómo amaneciste después de la moto de ayer?</div><div class="mut">Piernas, espalda, hombros... del 1 al 5. Tarda 20 segundos.</div></div></div><button class="btn ghost" data-act="motoask" data-d="${yd}">Completar</button></div>`;
@@ -780,7 +783,8 @@ function heroCard(p,P){
   h+=why(p);
   if(S.block.week===4)h+=`<div class="tag warn" style="margin-top:8px">Descarga: menos series</div>`;
   if(motoEn2(t)&&s.ex.some(e=>e.grip))h+=`<div class="ban warn">${GRIPMSG}</div>`;
-  h+=`<details class="exd"><summary>${s.ex.length} ejercicios: ${esc(s.ex[0].n)}, ${esc(s.ex[1].n)}… <b>Ver todos ▾</b></summary><ul class="exl">${s.ex.map(e=>`<li data-act="how" data-id="${e.id}">${thumb(e.id)}<span class="nm">${esc(e.n)}</span><b>${e.s} × ${esc(e.r)}</b></li>`).join('')}</ul><div class="note">Tocá un ejercicio para ver cómo se hace.</div></details>`;
+  const exv=visibleEx(k,{});
+  h+=`<details class="exd"><summary>${exv.length} ejercicios: ${esc(exv[0].n)}, ${esc(exv[1].n)}… <b>Ver todos ▾</b></summary><ul class="exl">${exv.map(e=>`<li data-act="how" data-id="${e.id}">${thumb(e.id)}<span class="nm">${esc(e.n)}</span><b>${e.s} × ${esc(e.r)}</b></li>`).join('')}</ul><div class="note">Tocá un ejercicio para ver cómo se hace.</div></details>`;
   h+=`<button class="btn" data-act="checkin" data-v="${k}">${ic('play')} Empezar</button>`;
  }else if(k==='MOTO'){
   h+=hd(k,'Toca hoy','Moto','Antes de salir (10\')');
@@ -812,8 +816,9 @@ function otherSessions(P){
 /* ============ Check-in ============ */
 function openCheckin(type){CI={type,s:1,c:1,e:1,express:false,light:null,mn:daysSinceMoto()};drawCheckin()}
 function ciBad(){return(CI.s===0)+(CI.c===0)+(CI.e===0)+(CI.mn!=null&&CI.mn<=1?1:0)}
+function ciLight(){return CI.light==null?ciBad()>=2||!!rLiv():CI.light}
 function drawCheckin(){
- const bad=ciBad(),light=CI.light==null?bad>=2:CI.light;
+ const bad=ciBad(),light=ciLight(),rl=rLiv();
  const q=(key,lab,ops)=>`<div class="q"><div class="k">${lab}</div><div class="chips">${ops.map((o,i)=>`<button class="chip ${CI[key]===i?'on':''}" data-act="ci" data-q="${key}" data-v="${i}">${o}</button>`).join('')}</div></div>`;
  let rec;
  if(bad===0)rec='<div class="ban ok">Todo bien. Sesión completa.</div>';
@@ -826,6 +831,7 @@ function drawCheckin(){
  ${q('e','Energía',['Baja','Normal','Alta'])}
  ${CI.mn!=null&&CI.mn<=1?`<div class="ban warn">Anduviste en moto ${CI.mn===0?'hoy':'ayer'}: lo cuento como un indicador bajo (antebrazos y piernas todavía cargados).</div>`:''}
  ${rec}
+ ${rl?`<div class="ban warn">${esc(rl.motivo)} Por eso la versión liviana arranca prendida. Si la apagás, no insisto con este aviso.</div>`:''}
  <div class="tgl" data-act="cit" data-v="light"><div><div class="k">Versión liviana</div><div class="mut">-1 serie por ejercicio, RPE 7</div></div><div class="sw ${light?'on':''}"></div></div>
  <div class="tgl" data-act="cit" data-v="express"><div><div class="k">Poco tiempo (express ~40')</div><div class="mut">Solo los ejercicios principales</div></div><div class="sw ${CI.express?'on':''}"></div></div>
  <button class="btn" data-act="start">Arrancar</button>`)}
@@ -836,8 +842,10 @@ async function keepAwake(on){try{if(on&&'wakeLock' in navigator&&!wakeLock){wake
 function startWorkout(type,mode){
  const d={date:todayStr(),type,mode,ex:{},t0:Date.now()};
  for(const e of visibleEx(type,mode)){
-  const sg=e.kg?suggestKg(e.id,e.inc,mode):null;
+  const fijo=rAltFijo(e.id),af=fijo?altOf(e.id,fijo.alt):null,te=af||e; // parecido fijo por regla: su peso es el de weights[alt]
+  const sg=te.kg?suggestKg(af?af.id:e.id,te.inc,mode):null;
   d.ex[e.id]={done:Array(setsFor(e,mode)).fill(false),kg:sg?sg.kg:'',sug:sg,feel:null,val:''};
+  if(af)d.ex[e.id].alt=af.id;
   if(e.items)for(const it of e.items)if(it.id){const s2=suggestKg(it.id,it.inc,mode);d.ex[it.id]={kg:s2?s2.kg:'',sug:s2,feel:null}}
  }
  S.draft=d;save();view='work';sheet('');render();scrollTo(0,0);keepAwake(true)}
@@ -885,6 +893,7 @@ function renderWork(){
   if(e.grp&&e.grp!==grp){grp=e.grp;h+=`<h2>${esc(grp)}</h2>`}
   const all=x.done.every(Boolean);
   h+=`<div class="ex ${all?'alldone':''}"><div class="exh"><span class="n">${all?ic('check'):String(num).padStart(2,'0')}</span><div><div class="t">${esc(a?a.n:e.n)}</div>${a?`<div class="mut">En lugar de ${esc(e.n)}</div>`:''}${e.grip&&motoEn2(d.date)?'<span class="tag warn">Agarre liviano</span>':''}<div><span class="sr">${x.done.length} × ${esc(a&&a.r||e.r)}</span> <span class="mut">· pausa ${e.rest?(e.rest>=60?(e.rest/60)+"'":e.rest+'"'):'–'}</span></div>${a?`<div class="note">${esc(a.h)}</div>`:`<button class="howl" data-act="how" data-id="${e.id}">${ic('info')} Cómo se hace</button>`}${ALT[e.id]?`<div><button class="howl" data-act="alt" data-id="${e.id}">⇄ ${a?'Cambiar o volver':'Ocupado: hacer otro'}</button></div>`:''}</div>${a?'':thumb(e.id)}</div>`;
+  h+=reglasEj(e.id,x);
   if(e.note&&!a)h+=`<div class="note">${esc(e.note)}</div>`;
   const un=ultimaNota(e.id);if(un)h+=`<div class="note">La última vez: ${esc(un)}</div>`;
   if(e.items)h+=`<ol class="l">${e.items.map(it=>`<li>${esc(it.n)}</li>`).join('')}</ol>`;
@@ -913,7 +922,8 @@ function finishWorkout(){
   if(x.alt)L.ex[id].alt=x.alt;
   if(x.why)L.ex[id].why=x.why;
   if(x.nota&&x.nota.trim())L.ex[id].nota=x.nota.trim();
-  if(upd&&kg!==''&&kg!=null)S.weights[x.alt||id]={kg:+kg,feel:x.feel||(x.done&&sets<of?'parcial':'justo'),date:d.date}}
+  if(upd&&kg!==''&&kg!=null)S.weights[x.alt||id]={kg:+kg,feel:x.feel||(x.done&&sets<of?'parcial':'justo'),date:d.date};
+  if(hecho)reglasUso(id,x,d.date)}
  if(L.dur>300)L.dur=null;
  S.log[d.date]=L;S.draft=null;save();stopTimer();keepAwake(false);view='hoy';sheet('');render();scrollTo(0,0);toast('Sesión guardada 💪')}
 
@@ -974,12 +984,12 @@ const QS_ETQ=[['casi','Casi nunca lo hacés'],['noll','Siempre "No llegué"'],['
 const QS_TERR={trabado:'trabado',canadon:'cañadón',mixto:'mixto'};
 const qsKg=v=>v!==''&&v!=null&&!isNaN(+v)?+v:null;
 const qsMean=a=>a.reduce((s,x)=>s+x,0)/a.length;
-function qsEjercicio(e,t){ // e: ejercicio de SES. Ventana de series: 28 días; cargas: todo el historial sin días livianos.
+function qsEjercicio(e,t){ // e: ejercicio de SES. Ventana de series: 28 días; cargas: todo el historial sin días livianos ni descargas.
  const lim=addDays(t,-28),own=[],alts=[],mot={};
  let tocaba=0,hechas=0,sets=0,of=0,nAlt=0;
  for(const d of Object.keys(S.log).sort()){
   const L=S.log[d],x=L.ex&&L.ex[e.id];if(!x||!(x.of>0))continue;
-  const hecha=x.sets>0,liv=!!(L.mode&&L.mode.light),kg=qsKg(x.kg);
+  const hecha=x.sets>0,liv=!!(L.mode&&L.mode.light)||L.bw===4,kg=qsKg(x.kg);
   if(hecha&&!liv){(x.alt?alts:own).push({d,kg,feel:x.feel,alt:x.alt})}
   if(d<=lim)continue;
   tocaba++;sets+=x.sets||0;of+=x.of;if(hecha){hechas++;if(x.alt)nAlt++}
@@ -1025,7 +1035,7 @@ function renderQueTeSirve(){
  if(!rows.length)h+='<div class="mut">Todavía no hay sesiones guardadas.</div>';
  for(const [et,nm] of QS_ETQ){const g=rows.filter(r=>r.et===et);if(!g.length)continue;
   h+=`<div class="qsg ${et}">${nm} <small>${g.length}</small></div>`+g.map(qsRow).join('')}
- h+='<div class="note">Los días livianos no cuentan para la carga. Un parecido cuenta como hecho del original.</div>';
+ h+='<div class="note">Los días livianos y las descargas no cuentan para la carga. Un parecido cuenta como hecho del original.</div>';
  const mo=qsMotos(t),comp=mo.filter(r=>r.h&&r.pump>0);
  h+='<div class="k" style="margin-top:16px">Moto contra lo hecho los 7 días antes</div>';
  if(!mo.length)h+='<div class="mut">Sin salidas registradas.</div>';
@@ -1036,12 +1046,104 @@ function renderQueTeSirve(){
   else h+=`<div class="qsc">${qsTexto(qsCompara(comp,'bici'),'Minutos de bici')}</div><div class="qsc">${qsTexto(qsCompara(comp,'gyms'),'Sesiones de gym')}</div><div class="note">Se comparan salidas parecidas (mismo terreno, hasta 0,5 h de diferencia).</div>`}
  return h+'</div>'}
 
+// ---------- Reglas ----------
+// Cambios automáticos, a la vista y reversibles. Diseño y umbrales: PENDIENTES.md. Quedan en S.reglas y suben a historial.json para evaluarlos en la etapa 4.
+const R_DIAS=28;
+const ZONA_EX={pump:['b8','b9'],lumbar:['a5','a6'],hombros:['b5']};
+const rAct=(regla,ej)=>S.reglas.filter(r=>r.estado==='activa'&&r.regla===regla&&(ej==null||r.ej===ej));
+const rPorId=id=>S.reglas.find(r=>r.id===id);
+const rAltFijo=id=>rAct('sinhacer',id).find(r=>r.alt);
+const rBaja=kgId=>S.reglas.find(r=>r.estado==='activa'&&r.kgId===kgId);
+const rLiv=()=>rAct('liviana')[0]||null;
+function rUltima(regla,ej){const a=S.reglas.filter(r=>r.regla===regla&&r.ej===ej);return a[a.length-1]||null}
+// Bloqueada: ya está activa, o se deshizo hace menos de 4 semanas.
+function rBloq(regla,ej,t){const u=rUltima(regla,ej);return !!u&&(u.estado==='activa'||(u.estado==='deshecha'&&t<addDays(u.hasta,R_DIAS)))}
+// Lo anterior a la última vez que actuó ya no cuenta: hacen falta datos nuevos.
+function rDesde(regla,ej){const u=rUltima(regla,ej);return u?(u.hasta||u.desde):''}
+function rNueva(o,t){S.reglas.push(Object.assign({id:'r'+(S.reglas.length+1),desde:t,vence:addDays(t,R_DIAS),hasta:null,estado:'activa',aplicada:null,visto:false},o))}
+function rFin(r,t,usada){r.estado='fin';r.hasta=t;if(usada)r.aplicada=t}
+// Las últimas n veces que tocaba el ejercicio, de la más nueva a la más vieja.
+function rUlt(id,desde,n){const out=[];
+ for(const d of Object.keys(S.log).sort().reverse()){if(d<=desde)break;const x=S.log[d].ex&&S.log[d].ex[id];if(x&&x.of>0){out.push(x);if(out.length===n)break}}
+ return out}
+// Veces hechas con su propio peso, sin parecido, día liviano ni descarga.
+function rPropias(id,desde){let n=0;for(const d in S.log){if(d<=desde)continue;const L=S.log[d],x=L.ex&&L.ex[id];if(x&&x.sets>0&&!x.alt&&!(L.mode&&L.mode.light)&&L.bw!==4)n++}return n}
+function rElegirAlt(id){
+ for(const d of Object.keys(S.log).sort().reverse()){const x=S.log[d].ex&&S.log[d].ex[id],a=x&&altOf(id,x.alt);if(a)return a}
+ return ALT[id].find(a=>!a.kg)||ALT[id][0]}
+function rSenales(t){const out=[],lm=lastMoto();
+ if(lm&&lm.d>=addDays(t,-2)){const hi=ZONAS.map(z=>z[0]).filter(k=>z5(lm.m,k)>=4);
+  if(hi.length)out.push({ej:'moto:'+lm.d,vence:addDays(lm.d,2),motivo:`Moto del ${fmtD(lm.d)}: ${hi.map(k=>ZN(k).toLowerCase()+' '+z5(lm.m,k)+'/5').join(', ')}.`})}
+ for(let i=0;i<=2;i++){const d=addDays(t,-i),L=S.log[d];
+  if(L&&L.type==='OTRO'&&+L.cans>=4)out.push({ej:'otro:'+d,vence:addDays(d,2),motivo:`El ${fmtD(d)} anotaste cansancio ${L.cans} de 5.`})}
+ return out}
+function reglasEval(){
+ if(S.draft)return;
+ const t=todayStr(),n0=S.reglas.length,normal=S.block.week!==4&&!S.retorno,rep=motivosRep();let venc=false;
+ for(const r of S.reglas)if(r.estado==='activa'&&r.vence&&t>r.vence){rFin(r,t);venc=true}
+ for(const k of GYM)for(const e of SES[k].ex){const id=e.id;
+  if(!rBloq('sinhacer',id,t)){const u=rUlt(id,rDesde('sinhacer',id),3),c=w=>u.filter(x=>x.why===w).length;
+   if(u.length===3&&u.every(x=>!x.sets)){
+    if(c('equipo')>=2&&ALT[id]){const a=rElegirAlt(id);
+     rNueva({regla:'sinhacer',tipo:'parecido',ej:id,alt:a.id,vence:null,motivo:`${e.n}: 3 veces sin hacer por falta de equipo.`,cambio:`Queda fijo ${a.n}, con su propio peso.`},t)}
+    else if(c('tiempo')>=2&&e.core)
+     rNueva({regla:'sinhacer',tipo:'extra',ej:id,motivo:`${e.n}: 3 veces sin hacer por falta de tiempo.`,cambio:'Pasa a "Si te da el tiempo" por 4 semanas.'},t)}}
+  if(!rBloq('dolor',id,t)&&rep.some(m=>m.id===id&&m.why==='dolor')){
+   const u=rUlt(id,rDesde('dolor',id),3);
+   if(u.filter(x=>x.why==='dolor'&&x.sets<x.of).length>=2){
+    const fijo=rAltFijo(id),kid=fijo?fijo.alt:id,te=fijo?altOf(id,fijo.alt):e,w=S.weights[kid],a=te.kg&&w&&+w.kg>0?round(+w.kg*0.9,te.inc):null,baja=a!=null&&a<+w.kg,prop=ALT[id]&&!fijo;
+    const que=baja?`La próxima vez, 10 % menos (${a} kg)${prop?', o probá un parecido (⇄ en la sesión)':''}.`:prop?'Probá un parecido (⇄ en la sesión).':'Hacelo más suave o dejalo por ahora.';
+    rNueva(Object.assign({regla:'dolor',ej:id,motivo:`${te.n}: ${rUltima('dolor',id)?'sigue la molestia':'2 veces con molestia'}.`,cambio:`${que} ${rUltima('dolor',id)?'Consultá':'Si sigue, consultá'} con un médico o kinesiólogo.`},baja?{kgId:kid,de:+w.kg,a}:{}),t)}}
+  if(normal&&e.kg&&!rBloq('carga',id,t)&&!rAct('dolor',id).length&&!rAltFijo(id)){
+   const w=S.weights[id],a=w&&+w.kg>0?round(+w.kg*0.9,e.inc):null;
+   if(a!=null&&a<+w.kg){const et=qsEjercicio(e,t).et,nec=et==='noll'?2:et==='estan'?3:0;
+    if(nec&&rPropias(id,rDesde('carga',id))>=nec)
+     rNueva({regla:'carga',ej:id,kgId:id,de:+w.kg,a,motivo:`${e.n}: ${et==='noll'?'2 veces seguidas "No llegué"':'3 sesiones con la misma carga'}.`,cambio:`La próxima sesión, 10 % menos: ${a} kg en vez de ${+w.kg}.`},t)}}}
+ const mo=qsMotos(t);
+ for(const z in ZONA_EX){if(rBloq('zona',z,t))continue;const des=rDesde('zona',z),u=mo.filter(r=>r.d>des).slice(-2);
+  if(u.length===2&&u.every(r=>r[z]>=4)&&u[1].d>=addDays(t,-21))
+   rNueva({regla:'zona',ej:z,motivo:`${ZN(z)} en 4 o más en las últimas 2 salidas.`,cambio:`Suben a lo principal: ${ZONA_EX[z].map(i=>EXNAME[i]).join(', ')}. Revisá el setup (Ajustes → checklist).${z==='pump'?' Y no saltees la bici, que es lo que más lo baja.':''}`},t)}
+ if(normal&&!rLiv()){const s=rSenales(t).find(g=>!S.reglas.some(r=>r.regla==='liviana'&&r.ej===g.ej));
+  if(s)rNueva({regla:'liviana',ej:s.ej,vence:s.vence,motivo:s.motivo,cambio:'La próxima sesión de gym arranca en versión liviana.'},t)}
+ if(venc||S.reglas.length!==n0)save()}
+// Lo principal y lo extra según las reglas activas. Sin reglas activas devuelve la rutina tal cual.
+function rOrden(type){const ex=SES[type].ex,ext={},pri={};
+ for(const r of rAct('sinhacer'))if(r.tipo==='extra')ext[r.ej]=1;
+ for(const r of rAct('zona'))for(const i of ZONA_EX[r.ej])pri[i]=1;
+ return ex.map(e=>ext[e.id]&&e.core?{...e,core:0}:pri[e.id]&&!e.core?{...e,core:1}:e).sort((a,b)=>(b.core?1:0)-(a.core?1:0))}
+function rDeshacer(id){const r=rPorId(id);if(!r||r.estado!=='activa')return;
+ r.estado='deshecha';r.hasta=todayStr();r.visto=true;
+ const d=S.draft,x=d&&d.ex[r.ej];if(!x)return;
+ if(r.alt&&x.alt===r.alt)pickAlt(r.ej,'');
+ else if(x.sug&&x.sug.regla===r.id){const e=SES[d.type].ex.find(q=>q.id===r.ej),a=altOf(r.ej,x.alt),te=a||e,sg=suggestKg(a?a.id:r.ej,te.inc,d.mode);
+  if(+x.kg===x.sug.kg)x.kg=sg?sg.kg:'';x.sug=sg}}
+// Al terminar la sesión: la baja usada se cierra, y si eligió otro parecido, ése pasa a ser el fijo.
+function reglasUso(id,x,fecha){
+ if(x.sug&&x.sug.regla){const r=rPorId(x.sug.regla);if(r&&r.estado==='activa')rFin(r,fecha,true)}
+ const f=rAltFijo(id);if(f&&x.alt&&x.alt!==f.alt){f.alt=x.alt;f.cambio=`Queda fijo ${EXNAME[x.alt]}, con su propio peso.`}}
+const rUndoBtn=r=>`<button class="btn sm ghost" style="float:none;color:inherit;font-size:14px" data-act="reglaundo" data-v="${r.id}">${r.regla==='dolor'&&!r.kgId?'No insistir':'Deshacer'}</button>`;
+function reglasBan(){return S.reglas.filter(r=>r.estado==='activa'&&!r.visto).map(r=>`<div class="ban ${r.regla==='dolor'?'bad':'warn'}"><button data-act="reglaok" data-v="${r.id}">✕</button><b>${r.regla==='dolor'?'Ojo con esta molestia.':'Cambió la rutina.'}</b> ${esc(r.motivo)} ${esc(r.cambio)}<div class="row">${rUndoBtn(r)}</div></div>`).join('')}
+// Lo que una regla le cambió a este ejercicio, dentro de la sesión.
+function reglasEj(id,x){const d=S.draft,hoyNo=S.block.week===4||S.retorno||(d.mode&&d.mode.light);
+ return S.reglas.filter(r=>r.estado==='activa'&&r.regla!=='liviana'&&(r.regla==='zona'?ZONA_EX[r.ej].includes(id):r.ej===id)).map(r=>`<div class="ban ${r.regla==='dolor'?'bad':'warn'}">${esc(r.motivo)} ${esc(r.cambio)}${r.kgId&&!(x.sug&&x.sug.regla===r.id)&&hoyNo?' Hoy no se suma: queda para la próxima sesión normal.':''}<div class="row">${rUndoBtn(r)}</div></div>`).join('')}
+function renderReglas(){
+ const act=S.reglas.filter(r=>r.estado==='activa'),pas=S.reglas.filter(r=>r.estado!=='activa').slice(-5).reverse();
+ let h='<h2>Reglas activas</h2><div class="card">';
+ if(!act.length)h+='<div class="mut">Ninguna regla activa: la rutina sigue como está.</div>';
+ for(const r of act)h+=`<div class="qs"><b>${esc(r.cambio)}</b><div class="mut">${esc(r.motivo)}</div><div class="note">Desde ${fmtD(r.desde)}${r.vence?' · hasta '+fmtD(r.vence):''}</div><div class="row">${rUndoBtn(r)}</div></div>`;
+ const esp=[];for(const k of GYM)for(const e of SES[k].ex){const u=rUlt(e.id,'',3);
+  if(u.length===3&&u.every(x=>!x.sets)&&u.filter(x=>x.why&&x.why!=='hecho').length<2&&!rUltima('sinhacer',e.id))esp.push(e.n)}
+ if(esp.length)h+=`<div class="k" style="margin-top:14px">Esperando motivo</div><div class="mut">${esc(esp.join(', '))}</div><div class="note">3 veces sin hacer y casi sin motivo anotado. No adivino: si elegís por qué al terminar la sesión, la regla puede actuar.</div>`;
+ if(pas.length)h+=`<div class="k" style="margin-top:14px">Ya terminaron</div>`+pas.map(r=>`<div class="note">${fmtD(r.hasta)} · ${r.estado==='deshecha'?'Deshecha':r.aplicada?'Aplicada':'Terminó'}: ${esc(r.motivo)}</div>`).join('');
+ return h+'<div class="note">Cada regla dice por qué actuó. Si deshacés una, no insiste con ese ejercicio por 4 semanas. Nunca suben peso.</div></div>'}
+
 /* ============ Vista PROGRESO ============ */
 function renderProgreso(){
  const t=todayStr(),mon=mondayOf(t);
  let h='<header class="top"><h1 class="ttl">Progreso</h1></header>'+coachCard(planWeek(mon),true)+'<h2>Sesiones de gym por semana</h2><div class="card"><div class="bars">';
  for(let w=7;w>=0;w--){const m=addDays(mon,-7*w),n=gymCount(m);h+=`<div style="height:${Math.max(4,n/3*100)}%;${n<2?'background:#6b4a33':''}" title="${n}/3"><span>${pd(m).getDate()}/${pd(m).getMonth()+1}</span></div>`}
  h+='</div><div style="height:18px"></div><div class="note">Cada barra es una semana (máx 3). Las oscuras tuvieron menos de 2 sesiones.</div></div>';
+ h+=renderReglas();
  h+=renderQueTeSirve();
  const dates=Object.keys(S.log).sort();
  const hist={};
@@ -1093,6 +1195,7 @@ function renderAjustes(){
 /* ============ Render ============ */
 function render(){
  if(view==='work'&&!S.draft)view='hoy';
+ reglasEval();
  const fn={hoy:renderHoy,semana:renderSemana,progreso:renderProgreso,ajustes:renderAjustes,work:renderWork}[view];
  $('#app').innerHTML=fn();
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view||(view==='work'&&b.dataset.v==='hoy')))}
@@ -1117,11 +1220,13 @@ document.addEventListener('click',e=>{
  case 'tab':view=v;sheet('');render();scrollTo(0,0);break;
  case 'dismiss':S.weekMsg=null;save();render();break;
  case 'reacok':S.reacOk=v;save();render();break;
+ case 'reglaok':{const r=rPorId(v);if(r){r.visto=true;save();render()}break}
+ case 'reglaundo':rDeshacer(v);save();render();toast('Deshecho. No insisto con esto por 4 semanas.');break;
  case 'closesheet':if(e.target===el||el.tagName==='BUTTON')sheet('');break;
  case 'checkin':openCheckin(v);break;
  case 'ci':CI[el.dataset.q]=+v;drawCheckin();break;
- case 'cit':if(v==='light'){const bad=ciBad();CI.light=!(CI.light==null?bad>=2:CI.light)}else CI.express=!CI.express;drawCheckin();break;
- case 'start':{const bad=ciBad();startWorkout(CI.type,{light:CI.light==null?bad>=2:CI.light,express:CI.express});break}
+ case 'cit':if(v==='light')CI.light=!ciLight();else CI.express=!CI.express;drawCheckin();break;
+ case 'start':{const light=ciLight(),rl=rLiv();if(rl){if(light)rFin(rl,todayStr(),true);else rDeshacer(rl.id)}startWorkout(CI.type,{light,express:CI.express});break}
  case 'swaptoday':replanDo(()=>{S.swap[todayStr()]='REC'});break;
  case 'unswap':replanDo(()=>{delete S.swap[d]});break;
  case 'resume':view='work';render();keepAwake(true);break;

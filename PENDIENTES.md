@@ -21,7 +21,7 @@ Prompt: "Seguí la etapa 1 de PENDIENTES.md. En `motoSheet` sumá, todos opciona
 
 Prompt: "Seguí la etapa 2 de PENDIENTES.md. En Progreso agregá 'Qué te sirve', en una sección nueva con separador. Por ejercicio: % de series hechas en las últimas 4 semanas, tendencia de carga y etiqueta (viene bien, estancado, casi nunca lo hacés, siempre 'No llegué'), con los motivos anotados. Por salida de moto: aguante y molestias contra lo hecho en los 7 días previos (minutos de bici, gyms, días desde el último agarre fuerte), comparando salidas de duración y dureza parecidas. Hasta tener 6 salidas comparables, mostrar sólo 'faltan N salidas'. Probar con datos reales y con datos inventados de 10 salidas."
 
-## Etapa 3: reglas que varían la rutina (Opus) — SIGUE ESTA
+## Etapa 3: reglas que varían la rutina (Opus) — HECHA (v27; separador "Reglas" en `index.html`)
 
 Diseño (manda sobre el prompt viejo de abajo). Sólo usa datos que ya se anotan: series, motivos, sensación y kg del gym; horas, molestias y terreno de la moto; `cans` de los días OTRO. Nada de preguntas nuevas.
 
@@ -55,6 +55,8 @@ Prompt: "Seguí la etapa 3 de PENDIENTES.md. Diseñá e implementá reglas visib
 - Cuatro semanas haciendo todo: rotar variantes para que no se estanque.
 Cada regla muestra por qué actuó. Registrar en el historial qué regla actuó y cuándo, para poder evaluarla después."
 
-## Etapa 4: revisión mensual con Claude (Opus, a partir de 6-8 semanas de datos)
+## Etapa 4: revisión mensual con Claude (Opus, a partir de 6-8 semanas de datos) — SIGUE ESTA, cuando haya datos
+
+Para evaluar las reglas: `S.reglas` en `historial.json` dice cuál actuó, cuándo y si se deshizo o se usó. También queda pendiente rotar variantes (ver el diseño de la etapa 3).
 
 Prompt: "Seguí la etapa 4 de PENDIENTES.md. Revisá `datos/historial.json` a fondo: qué mejoró el aguante, qué reglas ayudaron y qué conviene sacar. Separá lo que muestran los datos de lo que es opinión, y ajustá la rutina."
