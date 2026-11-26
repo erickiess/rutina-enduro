@@ -641,6 +641,7 @@ function insights(P,full){
  if(n>=3)out.push(['check','Semana de gym completa: 3 de 3. Bien ahí.']);
  else if(left.length)out.push(['gym',`Llevás ${n} de 3 gyms esta semana. Faltan: ${left.map(p=>SES[p.kind].name+(p.today?' hoy':' el '+DIAS_L[p.i])).join(', ')}.`]);
  for(const m of motivosRep().slice(0,2))out.push(m.why==='dolor'?['info',`${EXNAME[m.id]||m.id}: ${m.n} veces con molestia. Bajá la carga o cambialo, y si sigue, consultá.`]:['info',`${EXNAME[m.id]||m.id}: quedó ${m.n} veces sin terminar (${motivoName(m.why).toLowerCase()}). Conviene cambiarlo: contale a Claude.`]);
+ for(const k of [1,2]){const dd=addDays(t,-k),L=S.log[dd];if(L&&L.laburo&&(L.zonas||[]).length){out.push(['info',`${k===1?'Ayer':'Anteayer'} laburaste ${L.laburo==='dia'?'todo el día':'medio día'}${L.pasos?' ('+L.pasos+' pasos)':''} y quedaron cargados: ${L.zonas.map(z=>(ZONAS_LAB.find(x=>x[0]===z)||[,z])[1].toLowerCase()).join(', ')}. Si hoy molesta, bajá peso en eso o usá la versión liviana.`]);break}}
  const st=streak();if(st>=2)out.push(['zap',`${st} semanas seguidas con 2 o más gyms. La constancia es lo que más rinde.`]);
  const lg=lastGymDay();if(lg!=null&&lg>=6&&n===0)out.push(['clock',`Hace ${lg} días que no vas al gym: volvé con la versión liviana.`]);
  const pv=pumpTrend();if(pv.length>=3){const a=pv[pv.length-1],b=pv.slice(0,-1).reduce((x,y)=>x+y,0)/(pv.length-1);
@@ -799,9 +800,13 @@ function heroCard(p,P){
  }
  h+=`<button class="btn ghost" data-act="cambiar" data-d="${t}">Hoy no puedo / cambiar</button>`;
  return h+'</div>'}
+const ZONAS_LAB=[['hombros','Hombros'],['espalda','Espalda / lumbar'],['brazos','Brazos / antebrazos'],['piernas','Piernas'],['manos','Manos / muñecas']];
 function otroSheet(d){const L=S.log[d]&&S.log[d].type==='OTRO'?S.log[d]:{},b=S.bici[d]||{};
  const ch=(id,opts,v)=>`<div class="chips" id="${id}">${opts.map(([k,l])=>`<button class="chip ${v==k?'on':''}" data-act="mpick" data-v="${k}">${l}</button>`).join('')}</div>`;
  sheet(`<h1>Otra cosa · ${fmtD(d)}</h1><div class="mut">En vez de lo planeado. La sesión de gym se mueve a otro día si entra.</div>
+ <div class="q"><div class="k">Laburo físico (pala, césped, obra...)</div>${ch('olb',[['','No'],['medio','Medio día'],['dia','Día entero']],L.laburo||'')}
+ <input type="number" id="opa" inputmode="numeric" placeholder="Pasos (opcional, ej. 15000)" value="${esc(L.pasos||'')}" style="margin-top:8px">
+ <div class="k" style="margin-top:8px">Quedó cargado o con molestia (tocá varios)</div><div class="chips" id="oz">${ZONAS_LAB.map(([k,l])=>`<button class="chip ${(L.zonas||[]).includes(k)?'on':''}" data-act="ztog" data-v="${k}">${l}</button>`).join('')}</div></div>
  <div class="q"><div class="k">Bici (min)</div><input type="number" id="om" inputmode="numeric" placeholder="0 si no hubo" value="${esc(b.min||'')}">${ch('ot',[['REC','Suave'],['Z2','Z2'],['SUB','Fuerte']],b.tipo||'REC')}</div>
  <div class="q"><div class="k">Elongación / movilidad (min)</div><input type="number" id="os" inputmode="numeric" placeholder="ej. 20" value="${esc(L.stretch||'')}"></div>
  <div class="q"><div class="k">¿Cómo estabas? (1 = fresco, 5 = destruido)</div>${ch('oc',[1,2,3,4,5].map(n=>[n,n]),L.cans||'')}</div>
@@ -1260,8 +1265,10 @@ document.addEventListener('click',e=>{
  case 'biciask':biciSheet(d);break;
  case 'bicisave':{const tp=document.querySelector('#bt .chip.on');replanDo(()=>{S.bici[d]={min:$('#bm').value,tipo:tp?tp.dataset.v:'Z2',notas:$('#bn').value};if(S.plan[d]==='BICI')delete S.plan[d];delete S.unav[d]});break}
  case 'otro':otroSheet(d);break;
+ case 'ztog':el.classList.toggle('on');break;
  case 'otrosave':{const pk=id=>{const c=document.querySelector('#'+id+' .chip.on');return c?c.dataset.v:null},bm=+$('#om').value||0;
   replanDo(()=>{S.log[d]={type:'OTRO',status:'done',stretch:+$('#os').value||null,cans:+pk('oc')||null,nota:$('#on').value,bici:bm||null};
+   const lb=pk('olb');if(lb){Object.assign(S.log[d],{laburo:lb,pasos:+$('#opa').value||null,zonas:[...document.querySelectorAll('#oz .chip.on')].map(c=>c.dataset.v)})}
    if(bm)S.bici[d]={min:bm,tipo:pk('ot')||'REC',notas:''};else delete S.bici[d];delete S.unav[d];delete S.swap[d]});break}
  case 'ghsave':{const c=ghCfg();c.repo=$('#ghr').value.trim();const tk=$('#ght').value.trim();if(tk)c.token=tk;ghSet(c);syncNow(true);break}
  case 'ghsync':syncNow(true);break;
