@@ -798,6 +798,7 @@ function heroCard(p,P){
   h+=`<ul class="tips">${a.li.map(x=>`<li>${x}</li>`).join('')}${p.note?`<li><b>${p.note}</b></li>`:''}</ul>`;
   h+=`<div class="row"><label class="kg"><input type="number" id="actmin" inputmode="numeric" placeholder="min"> minutos</label></div><button class="btn okb" data-act="actdone" data-v="${k}">${ic('check')} Hecho</button>`;
  }
+ h+=planB(p,P);
  h+=`<button class="btn ghost" data-act="cambiar" data-d="${t}">Hoy no puedo / cambiar</button>`;
  return h+'</div>'}
 const ZONAS_LAB=[['hombros','Hombros'],['espalda','Espalda / lumbar'],['brazos','Brazos / antebrazos'],['piernas','Piernas'],['manos','Manos / muñecas']];
@@ -817,6 +818,47 @@ function otherSessions(P){
  const todayK=P.days[dow(t)].kind,opts=pend.filter(g=>g!==todayK);
  if(!opts.length||S.log[t]&&GYM.includes(S.log[t].type))return '';
  return `<h2>¿Querés hacer otra hoy?</h2><div class="row">${opts.map(g=>`<button class="btn sm ghost" data-act="checkin" data-v="${g}">${SES[g].name} · ${SES[g].title}</button>`).join('')}</div><div class="note">Si adelantás una, el resto de la semana se reacomoda solo.</div>`}
+
+// ---------- Plan B: opción 2 y 3 si hoy no hacés lo que toca ----------
+// Rankea por estímulo parecido, lo pendiente de la semana y cuánto hace que no la hacés; simula la semana para ver qué se pierde.
+const isBike=k=>['Z2','SUB','BICI'].includes(k);
+const P2SIM={bici:{C:6,B:4,A:2},A:{C:3,B:3,bici:2},B:{C:4,A:3,bici:3},C:{bici:5,B:4,A:2}};
+const P2TXT={bici:{C:'Lo más parecido a la bici: pulsaciones altas y el agarre trabajando cansado.',B:'Espalda y agarre: también ayuda contra el arm pump, aunque no suma aeróbico.',A:'Piernas: no reemplaza la bici, pero adelanta la sesión pesada.'},
+ A:{C:'Circuito: algo de piernas y pulsaciones altas.',B:'Espalda y agarre: las piernas quedan para otro día.',bici:'Aeróbico: las piernas trabajan sin carga pesada.'},
+ B:{C:'Circuito: también trabaja el agarre cansado.',A:'Piernas: adelanta la sesión pesada.',bici:'Aeróbico largo: lo que más baja el arm pump.'},
+ C:{bici:'Aeróbico: el mismo objetivo que el circuito, más largo.',B:'Espalda y agarre: la otra mitad del circuito.',A:'Piernas: adelanta la sesión pesada.'}};
+function diasDesde(g){const t=todayStr();for(let i=1;i<=60;i++){const L=S.log[addDays(t,-i)];if(L&&L.status==='done'&&L.type===g)return i}return null}
+function simHoy(t,c){const bk=[[S.log,t in S.log,S.log[t]],[S.bici,t in S.bici,S.bici[t]],[S.plan,t in S.plan,S.plan[t]]];
+ if(GYM.includes(c))S.log[t]={type:c,status:'done'};else S.bici[t]={min:60,tipo:'Z2'};
+ if(S.plan[t]==='BICI')delete S.plan[t];
+ try{return planWeek(mondayOf(t))}finally{for(const[o,had,val]of bk){if(had)o[t]=val;else delete o[t]}}}
+function planBOpts(p,P){
+ const t=p.date,k=p.kind,base=isBike(k)?'bici':GYM.includes(k)?k:null;
+ if(!base||p.done||p.inprog||p.log||t!==todayStr())return[];
+ const hecho=g=>P.days.some(q=>q.kind===g&&(q.done||q.inprog)),ay=S.log[addDays(t,-1)],ayT=ay&&ay.status==='done'?ay.type:null,out=[];
+ for(const c of Object.keys(P2SIM[base])){
+  let s=P2SIM[base][c];const nota=[];
+  if(c==='bici'){if(P.bikeDone)continue}
+  else{
+   if(hecho(c)||motoOn(addDays(t,1)))continue;               // ya hecha esta semana, o mañana hay moto
+   if(c==='A'&&motoOn(addDays(t,2)))continue;                // piernas pesadas no, 2 días antes de la moto
+   if((c==='A'&&ayT==='C')||(c==='C'&&ayT==='A'))continue;   // A y C no en días seguidos
+   if(motoAt(addDays(t,-1))){s-=2;nota.push('Ayer hubo moto: elegí la versión liviana.')}
+   if(motoEn2(t)&&SES[c].ex.some(e=>e.grip)){s-=1;nota.push('Moto en 48 h: el agarre va liviano.')}
+   const dd=diasDesde(c);s+=Math.min(dd==null?14:dd,14)/7;if(dd==null||dd>=10)nota.push(dd==null?'Todavía no la hiciste.':`Hace ${dd} días que no la hacés.`)}
+  const P2=simHoy(t,c);
+  for(const g of P2.dropped.filter(g=>!P.dropped.includes(g)&&g!==c&&g!==base)){s-=3;nota.push(`${SES[g].name} no entra esta semana.`)}
+  if(base==='bici'){const q=P2.days.find(q=>q.date>t&&isBike(q.kind)&&!q.done);if(q)nota.unshift(`La bici pasa al ${DIAS_L[q.i]}.`);else{s-=3;nota.unshift('La bici no vuelve a entrar esta semana.')}}
+  else{const q=P2.days.find(q=>q.date>t&&q.kind===base);if(q)nota.unshift(`${SES[base].name} pasa al ${DIAS_L[q.i]}.`);else{s-=3;nota.unshift(`${SES[base].name} no vuelve a entrar esta semana.`)}}
+  out.push({c,s,txt:P2TXT[base][c],nota})}
+ return out.sort((x,y)=>y.s-x.s).slice(0,2)}
+function planB(p,P){
+ const o=planBOpts(p,P);if(!o.length)return'';
+ let h=`<div class="k" style="margin-top:16px">¿Hoy no? Lo que mejor lo reemplaza</div>`;
+ h+=o.map((x,n)=>{const bi=x.c==='bici',tt=bi?ACT[P.bike].name+' · '+ACT[P.bike].title:SES[x.c].name+' · '+SES[x.c].title;
+  return `<button class="opt" ${bi?`data-act="plan" data-v="BICI" data-d="${p.date}"`:`data-act="plan2" data-v="${x.c}" data-de="${p.kind}"`}>${ic(bi?'bici':'gym')}<span><b>Opción ${n+2}: ${tt}</b><small>${x.txt}${x.nota.length?' '+x.nota.join(' '):''}</small></span></button>`}).join('');
+ if(isBike(p.kind))h+=`<div class="note">¿Es por el calor? Temprano o al atardecer, o 45-60' de bici fija en el gym, cuentan igual: anotalo como bici.</div>`;
+ return h}
 
 /* ============ Check-in ============ */
 function openCheckin(type){CI={type,s:1,c:1,e:1,express:false,light:null,mn:daysSinceMoto()};drawCheckin()}
@@ -929,6 +971,7 @@ function finishWorkout(){
   if(x.nota&&x.nota.trim())L.ex[id].nota=x.nota.trim();
   if(upd&&kg!==''&&kg!=null)S.weights[x.alt||id]={kg:+kg,feel:x.feel||(x.done&&sets<of?'parcial':'justo'),date:d.date};
   if(hecho)reglasUso(id,x,d.date)}
+ if(d.de)L.de=d.de; // la hizo en lugar de lo que tocaba ese día
  if(L.dur>300)L.dur=null;
  S.log[d.date]=L;S.draft=null;save();stopTimer();keepAwake(false);view='hoy';sheet('');render();scrollTo(0,0);toast('Sesión guardada 💪')}
 
@@ -1229,9 +1272,10 @@ document.addEventListener('click',e=>{
  case 'reglaundo':rDeshacer(v);save();render();toast('Deshecho. No insisto con esto por 4 semanas.');break;
  case 'closesheet':if(e.target===el||el.tagName==='BUTTON')sheet('');break;
  case 'checkin':openCheckin(v);break;
+ case 'plan2':openCheckin(v);CI.de=el.dataset.de;break; // opción 2/3: queda anotado qué reemplazó
  case 'ci':CI[el.dataset.q]=+v;drawCheckin();break;
  case 'cit':if(v==='light')CI.light=!ciLight();else CI.express=!CI.express;drawCheckin();break;
- case 'start':{const light=ciLight(),rl=rLiv();if(rl){if(light)rFin(rl,todayStr(),true);else rDeshacer(rl.id)}startWorkout(CI.type,{light,express:CI.express});break}
+ case 'start':{const light=ciLight(),rl=rLiv();if(rl){if(light)rFin(rl,todayStr(),true);else rDeshacer(rl.id)}startWorkout(CI.type,{light,express:CI.express});if(CI.de){S.draft.de=CI.de;save()}break}
  case 'swaptoday':replanDo(()=>{S.swap[todayStr()]='REC'});break;
  case 'unswap':replanDo(()=>{delete S.swap[d]});break;
  case 'resume':view='work';render();keepAwake(true);break;
